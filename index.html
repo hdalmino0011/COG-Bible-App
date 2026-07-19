@@ -48,7 +48,7 @@
 
     <div class="search-bar hidden" id="search-bar">
       <i class="fa-solid fa-magnifying-glass search-bar-icon"></i>
-      <input type="text" id="verse-search-input" placeholder="Search book, chapter, or keyword…" list="book-suggestions">
+      <input type="text" id="verse-search-input" placeholder="Search book, chapter, verse, or keyword…" list="book-suggestions">
       <datalist id="book-suggestions"></datalist>
       <button class="search-submit-btn" id="search-submit"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
@@ -85,7 +85,10 @@
       </div>
     </div>
 
-    <!-- Floating copy/highlight toolbar (hidden by default) -->
+    <!-- Toast notification for search results -->
+    <div id="toast-notification" class="toast-notification hidden"></div>
+
+    <!-- Floating copy/highlight toolbar -->
     <div id="verse-toolbar" class="verse-toolbar hidden">
       <div class="toolbar-group">
         <span class="toolbar-label">Highlight:</span>
@@ -184,7 +187,7 @@
         </div>
       </div>
 
-      <!-- Font Section -->
+      <!-- Font Style Section -->
       <div class="settings-section">
         <h2 class="settings-heading">Font Style</h2>
         <div class="font-options">
@@ -192,6 +195,17 @@
           <button class="font-btn" data-font="Times New Roman">Times New Roman</button>
           <button class="font-btn" data-font="Georgia">Georgia</button>
           <button class="font-btn" data-font="Arial">Arial</button>
+        </div>
+      </div>
+
+      <!-- Font Size Section -->
+      <div class="settings-section">
+        <h2 class="settings-heading">Font Size</h2>
+        <div class="font-size-options">
+          <button class="font-size-btn" data-size="small">Small</button>
+          <button class="font-size-btn active" data-size="medium">Medium</button>
+          <button class="font-size-btn" data-size="large">Large</button>
+          <button class="font-size-btn" data-size="xlarge">X-Large</button>
         </div>
       </div>
 
@@ -207,13 +221,13 @@
             <span class="about-label">Version</span>
             <span class="about-value">1.0.0</span>
           </div>
-          <div class="about-row">
+          <div class="about-row about-row-church">
             <span class="about-label">Church</span>
-            <span class="about-value">The Church of God (Truth, Justice, and Righteousness)</span>
+            <span class="about-value">The Church of God<br>(Truth, Justice, and Righteousness)</span>
           </div>
-          <div class="about-row">
+          <div class="about-row about-row-versions">
             <span class="about-label">Bible versions</span>
-            <span class="about-value">Cebuano (Bugna) KJV &amp; English (KJV)</span>
+            <span class="about-value">Cebuano (Bugna) KJV<br>&amp; English (KJV)</span>
           </div>
         </div>
       </div>
