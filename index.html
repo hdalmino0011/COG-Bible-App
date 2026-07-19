@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>COG (T.J.R) Bible</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===================== SPLASH SCREEN ===================== -->
+<div id="splash-screen" class="splash-screen">
+  <div class="splash-inner">
+    <div class="emblem" aria-hidden="true">
+      <svg class="emblem-ring" viewBox="0 0 240 240">
+        <defs>
+          <path id="ringTextPath" d="M 120,120 m -95,0 a 95,95 0 1,1 190,0 a 95,95 0 1,1 -190,0" />
+        </defs>
+        <circle class="emblem-ring-outer" cx="120" cy="120" r="112" />
+        <circle class="emblem-ring-inner" cx="120" cy="120" r="94" />
+        <text class="emblem-ring-text">
+          <textPath href="#ringTextPath" startOffset="0%">
+            THE&#8226;GOOD&#8226;AND&#8226;JUST&#8226;JERUSALEM, ISRAEL&#8226;ANNO DOMINI&#8226;
+          </textPath>
+        </text>
+      </svg>
+      <div class="emblem-core">
+        <span class="emblem-line small">THE</span>
+        <span class="emblem-line ref">Timothy</span>
+        <span class="emblem-line ref">3:15</span>
+        <span class="emblem-line ref">Ephesians</span>
+        <span class="emblem-line ref">5:23</span>
+      </div>
+    </div>
+    <h1 class="splash-title">The Church of God</h1>
+    <p class="splash-subtitle">(Truth, Justice and Righteousness)</p>
+    <div class="spinner" aria-label="Loading">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== APP SHELL ===================== -->
+<div id="app" class="app hidden">
+
+  <!-- ---------- BIBLE SCREEN ---------- -->
+  <section id="screen-bible" class="screen active-screen">
+    <header class="topbar">
+      <h1 class="topbar-title">COG (T.J.R) Bible</h1>
+      <button class="icon-btn" id="search-toggle" aria-label="Search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+    </header>
+
+    <div class="search-bar hidden" id="search-bar">
+      <i class="fa-solid fa-magnifying-glass search-bar-icon"></i>
+      <input type="text" id="verse-search-input" placeholder="Search book or keyword…">
+    </div>
+
+    <div class="selectors">
+      <div class="select-wrap">
+        <label class="select-label" for="book-select">Book</label>
+        <select id="book-select" class="select-control"></select>
+        <i class="fa-solid fa-chevron-down select-caret"></i>
+      </div>
+      <div class="select-wrap">
+        <label class="select-label" for="chapter-select">Chapter</label>
+        <select id="chapter-select" class="select-control"></select>
+        <i class="fa-solid fa-chevron-down select-caret"></i>
+      </div>
+    </div>
+
+    <div class="reading-pane">
+      <div class="reading-col" id="col-cebuano">
+        <div class="reading-col-header">
+          <span class="col-flag">CEB</span>
+          Cebuano <em>(Bugna KJV)</em>
+        </div>
+        <div class="verse-list" id="verse-list-cebuano"></div>
+      </div>
+      <div class="reading-divider" aria-hidden="true"></div>
+      <div class="reading-col" id="col-english">
+        <div class="reading-col-header">
+          <span class="col-flag">ENG</span>
+          English <em>(KJV)</em>
+        </div>
+        <div class="verse-list" id="verse-list-english"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- QUIZ SCREEN ---------- -->
+  <section id="screen-quiz" class="screen">
+    <header class="topbar">
+      <h1 class="topbar-title">Bible Quiz</h1>
+    </header>
+
+    <div class="screen-scroll">
+      <div class="quiz-categories">
+        <button class="quiz-cat-btn active" data-cat="old">Old Testament</button>
+        <button class="quiz-cat-btn" data-cat="new">New Testament</button>
+        <button class="quiz-cat-btn" data-cat="all">All Books</button>
+      </div>
+
+      <div class="quiz-stats">
+        <div class="stat-card">
+          <span class="stat-value" id="stat-total">0</span>
+          <span class="stat-label">Total Questions</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="stat-correct">0</span>
+          <span class="stat-label">Correct Answers</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="stat-accuracy">0%</span>
+          <span class="stat-label">Accuracy</span>
+        </div>
+      </div>
+
+      <div id="quiz-play-area" class="quiz-play-area hidden"></div>
+
+      <button class="primary-btn" id="start-quiz-btn">
+        <i class="fa-solid fa-play"></i> Start Quiz
+      </button>
+      <p class="quiz-note" id="quiz-note">More questions for this category are coming soon — you're seeing the current sample set.</p>
+    </div>
+  </section>
+
+  <!-- ---------- DICTIONARY SCREEN ---------- -->
+  <section id="screen-dictionary" class="screen">
+    <header class="topbar">
+      <h1 class="topbar-title">Bible Dictionary</h1>
+    </header>
+
+    <div class="screen-scroll">
+      <div class="search-bar static-search">
+        <i class="fa-solid fa-magnifying-glass search-bar-icon"></i>
+        <input type="text" id="dict-search-input" placeholder="Search a term…">
+      </div>
+
+      <div id="dictionary-list" class="dictionary-list"></div>
+    </div>
+  </section>
+
+  <!-- ---------- SETTINGS SCREEN ---------- -->
+  <section id="screen-settings" class="screen">
+    <header class="topbar">
+      <h1 class="topbar-title">Settings</h1>
+    </header>
+
+    <div class="screen-scroll">
+      <div class="settings-section">
+        <h2 class="settings-heading">Theme</h2>
+        <div class="theme-options">
+          <button class="theme-btn active" data-theme="light">
+            <i class="fa-solid fa-sun"></i> Light Mode
+          </button>
+          <button class="theme-btn" data-theme="dark">
+            <i class="fa-solid fa-moon"></i> Dark Mode
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h2 class="settings-heading">About</h2>
+        <div class="about-card">
+          <div class="about-row">
+            <span class="about-label">App name</span>
+            <span class="about-value">COG (T.J.R) Bible</span>
+          </div>
+          <div class="about-row">
+            <span class="about-label">Version</span>
+            <span class="about-value">1.0.0</span>
+          </div>
+          <div class="about-row">
+            <span class="about-label">Church</span>
+            <span class="about-value">The Church of God (Truth, Justice and Righteousness)</span>
+          </div>
+          <div class="about-row">
+            <span class="about-label">Bible versions</span>
+            <span class="about-value">Bugna Cebuano KJV &amp; English KJV</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- BOTTOM NAVIGATION ---------- -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-screen="bible">
+      <i class="fa-solid fa-book"></i>
+      <span>Bible</span>
+    </button>
+    <button class="nav-btn" data-screen="quiz">
+      <i class="fa-solid fa-circle-question"></i>
+      <span>Quiz</span>
+    </button>
+    <button class="nav-btn" data-screen="dictionary">
+      <i class="fa-solid fa-book-open"></i>
+      <span>Dictionary</span>
+    </button>
+    <button class="nav-btn" data-screen="settings">
+      <i class="fa-solid fa-gear"></i>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
