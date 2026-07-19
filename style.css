@@ -360,6 +360,11 @@ input::-webkit-calendar-picker-indicator {
   backface-visibility:hidden;
   isolation:isolate;
   will-change:transform;
+  /* Fixed height + clipping: even if a rendering engine tries to let a
+     sliver of the row below peek through at the header's edge, this
+     hard-clips anything outside the header's own box. */
+  height:52px;
+  overflow:hidden;
 }
 
 /* Each header cell also gets its own solid background. Because the
@@ -368,6 +373,7 @@ input::-webkit-calendar-picker-indicator {
    background, some engines paint grid item backgrounds first and can
    create a seam where verse text peeks through between cells. */
 .reading-col-header{
+  height:100%;
   padding:6px 12px 12px;
   font-family:'Playfair Display', serif;
   font-weight:600;
@@ -377,6 +383,7 @@ input::-webkit-calendar-picker-indicator {
   align-items:center;
   gap:8px;
   background-color:var(--ivory);
+  overflow:hidden;
   transition: color 0.3s ease, background-color 0.3s ease;
 }
 
