@@ -48,7 +48,9 @@
 
     <div class="search-bar hidden" id="search-bar">
       <i class="fa-solid fa-magnifying-glass search-bar-icon"></i>
-      <input type="text" id="verse-search-input" placeholder="Search book or keyword…">
+      <input type="text" id="verse-search-input" placeholder="Search book, chapter, or keyword…" list="book-suggestions">
+      <datalist id="book-suggestions"></datalist>
+      <button class="search-submit-btn" id="search-submit"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
 
     <div class="selectors">
@@ -64,7 +66,8 @@
       </div>
     </div>
 
-    <div class="reading-pane">
+    <!-- Reading Pane with synchronized scrolling -->
+    <div class="reading-pane" id="reading-pane">
       <div class="reading-col" id="col-cebuano">
         <div class="reading-col-header">
           <span class="col-flag">CEB</span>
@@ -80,6 +83,25 @@
         </div>
         <div class="verse-list" id="verse-list-english"></div>
       </div>
+    </div>
+
+    <!-- Floating copy/highlight toolbar (hidden by default) -->
+    <div id="verse-toolbar" class="verse-toolbar hidden">
+      <div class="toolbar-group">
+        <span class="toolbar-label">Highlight:</span>
+        <button class="highlight-btn" data-color="#FFD700">Yellow</button>
+        <button class="highlight-btn" data-color="#FFB6C1">Pink</button>
+        <button class="highlight-btn" data-color="#98FB98">Green</button>
+        <button class="highlight-btn" data-color="#87CEEB">Blue</button>
+        <button class="highlight-btn" data-color="none">Clear</button>
+      </div>
+      <div class="toolbar-group">
+        <span class="toolbar-label">Copy:</span>
+        <button class="copy-btn" data-version="cebuano">Cebuano</button>
+        <button class="copy-btn" data-version="english">English</button>
+        <button class="copy-btn" data-version="both">Both</button>
+      </div>
+      <button class="toolbar-close" id="toolbar-close"><i class="fa-solid fa-times"></i></button>
     </div>
   </section>
 
@@ -143,18 +165,37 @@
     </header>
 
     <div class="screen-scroll">
+      <!-- Theme Section -->
       <div class="settings-section">
         <h2 class="settings-heading">Theme</h2>
         <div class="theme-options">
           <button class="theme-btn active" data-theme="light">
-            <i class="fa-solid fa-sun"></i> Light Mode
+            <i class="fa-solid fa-sun"></i> Light
           </button>
           <button class="theme-btn" data-theme="dark">
-            <i class="fa-solid fa-moon"></i> Dark Mode
+            <i class="fa-solid fa-moon"></i> Dark
+          </button>
+          <button class="theme-btn" data-theme="sepia">
+            <i class="fa-solid fa-book"></i> Sepia
+          </button>
+          <button class="theme-btn" data-theme="blue">
+            <i class="fa-solid fa-water"></i> Blue
           </button>
         </div>
       </div>
 
+      <!-- Font Section -->
+      <div class="settings-section">
+        <h2 class="settings-heading">Font Style</h2>
+        <div class="font-options">
+          <button class="font-btn active" data-font="Roboto">Roboto</button>
+          <button class="font-btn" data-font="Times New Roman">Times New Roman</button>
+          <button class="font-btn" data-font="Georgia">Georgia</button>
+          <button class="font-btn" data-font="Arial">Arial</button>
+        </div>
+      </div>
+
+      <!-- About Section -->
       <div class="settings-section">
         <h2 class="settings-heading">About</h2>
         <div class="about-card">
@@ -172,7 +213,7 @@
           </div>
           <div class="about-row">
             <span class="about-label">Bible versions</span>
-            <span class="about-value">Bugna Cebuano KJV &amp; English KJV</span>
+            <span class="about-value">Cebuano (Bugna) KJV &amp; English (KJV)</span>
           </div>
         </div>
       </div>
