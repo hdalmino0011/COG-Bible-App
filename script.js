@@ -95,7 +95,9 @@ const state = {
   theme: "light",
   font: "Roboto",
   fontSize: "medium",
-  isSyncing: false
+  isSyncing: false,
+  longPressTimer: null,
+  isLongPress: false
 };
 
 /* ---------------------------------------------------------
@@ -178,7 +180,7 @@ function populateChapters(defaultChapter){
 }
 
 /* ---------------------------------------------------------
-   9. VERSE RENDERING
+   9. VERSE RENDERING with LONG PRESS support
    --------------------------------------------------------- */
 function renderVerses(book, chapter){
   const cebList = document.getElementById("verse-list-cebuano");
@@ -197,31 +199,35 @@ function renderVerses(book, chapter){
   }
 
   data.forEach((verse, index) => {
+    // Cebuano column
     const cebDiv = document.createElement("div");
     cebDiv.className = "verse-item";
     cebDiv.dataset.verse = verse.v;
     cebDiv.dataset.index = index;
     cebDiv.dataset.book = book;
     cebDiv.dataset.chapter = chapter;
-    cebDiv.innerHTML = `<span class="verse-num">${verse.v}</span>${escapeHtml(verse.ceb)}`;
+    cebDiv.innerHTML = `<span class="verse-num">${verse.v}</span><span class="verse-text">${escapeHtml(verse.ceb)}</span>`;
     cebList.appendChild(cebDiv);
 
+    // English column
     const engDiv = document.createElement("div");
     engDiv.className = "verse-item";
     engDiv.dataset.verse = verse.v;
     engDiv.dataset.index = index;
     engDiv.dataset.book = book;
     engDiv.dataset.chapter = chapter;
-    engDiv.innerHTML = `<span class="verse-num">${verse.v}</span>${escapeHtml(verse.en)}`;
+    engDiv.innerHTML = `<span class="verse-num">${verse.v}</span><span class="verse-text">${escapeHtml(verse.en)}</span>`;
     engList.appendChild(engDiv);
 
+    // Long press handler for both columns
     [cebDiv, engDiv].forEach(el => {
-      el.addEventListener("click", (e) => {
-        const idx = el.dataset.index;
-        const cebEl = document.querySelector(`#verse-list-cebuano .verse-item[data-index="${idx}"]`);
-        const engEl = document.querySelector(`#verse-list-english .verse-item[data-index="${idx}"]`);
-        selectVerse(cebEl, engEl, book, chapter, verse.v, idx);
-      });
+      // Long press to select verse and show toolbar
+      el.addEventListener("mousedown", (e) => startLongPress(e, el, book, chapter, verse.v, index));
+      el.addEventListener("mouseup", () => clearLongPress());
+      el.addEventListener("mouseleave", () => clearLongPress());
+      el.addEventListener("touchstart", (e) => startLongPress(e, el, book, chapter, verse.v, index), { passive: true });
+      el.addEventListener("touchend", () => clearLongPress());
+      el.addEventListener("touchmove", () => clearLongPress());
     });
   });
 
@@ -231,7 +237,28 @@ function renderVerses(book, chapter){
 }
 
 /* ---------------------------------------------------------
-   10. VERSE SELECTION, HIGHLIGHT & COPY
+   10. LONG PRESS HANDLING
+   --------------------------------------------------------- */
+function startLongPress(e, element, book, chapter, verseNum, index){
+  state.isLongPress = false;
+  clearTimeout(state.longPressTimer);
+  
+  state.longPressTimer = setTimeout(() => {
+    state.isLongPress = true;
+    // Select the verse on long press
+    const idx = element.dataset.index;
+    const cebEl = document.querySelector(`#verse-list-cebuano .verse-item[data-index="${idx}"]`);
+    const engEl = document.querySelector(`#verse-list-english .verse-item[data-index="${idx}"]`);
+    selectVerse(cebEl, engEl, book, chapter, verseNum, idx);
+  }, 500);
+}
+
+function clearLongPress(){
+  clearTimeout(state.longPressTimer);
+}
+
+/* ---------------------------------------------------------
+   11. VERSE SELECTION, HIGHLIGHT & COPY
    --------------------------------------------------------- */
 function selectVerse(cebuanoEl, englishEl, book, chapter, verseNum, index){
   document.querySelectorAll(".verse-item.selected").forEach(el => el.classList.remove("selected"));
@@ -275,7 +302,7 @@ function initVerseToolbar(){
 
 function applyHighlight(color){
   if (!state.selectedVerse) {
-    showToast("Please select a verse first");
+    showToast("Please long press a verse first");
     return;
   }
   
@@ -303,7 +330,7 @@ function applyHighlight(color){
 
 function copyVerse(version){
   if (!state.selectedVerse) {
-    showToast("Please select a verse first");
+    showToast("Please long press a verse first");
     return;
   }
   
@@ -312,11 +339,11 @@ function copyVerse(version){
   
   let text = "";
   if (version === "cebuano" || version === "both") {
-    const cebText = cebuanoEl ? cebuanoEl.textContent.replace(/^\d+\s*/, "") : "";
+    const cebText = cebuanoEl ? cebuanoEl.querySelector('.verse-text')?.textContent || "" : "";
     text += `${reference} (Cebuano)\n${cebText}\n\n`;
   }
   if (version === "english" || version === "both") {
-    const engText = englishEl ? englishEl.textContent.replace(/^\d+\s*/, "") : "";
+    const engText = englishEl ? englishEl.querySelector('.verse-text')?.textContent || "" : "";
     text += `${reference} (English)\n${engText}`;
   }
   
@@ -355,7 +382,7 @@ function showCopyFeedback(version){
 }
 
 /* ---------------------------------------------------------
-   11. HIGHLIGHTS PERSISTENCE (localStorage)
+   12. HIGHLIGHTS PERSISTENCE (localStorage)
    --------------------------------------------------------- */
 function saveHighlights(){
   const highlights = {};
@@ -384,7 +411,7 @@ function loadHighlights(){
 }
 
 /* ---------------------------------------------------------
-   12. SYNCHRONIZED SCROLLING - FIXED
+   13. SYNCHRONIZED SCROLLING - FIXED
    --------------------------------------------------------- */
 function initSynchronizedScrolling(){
   const cebCol = document.getElementById("col-cebuano");
@@ -426,7 +453,7 @@ function initSynchronizedScrolling(){
 }
 
 /* ---------------------------------------------------------
-   13. SEARCH (Bible screen) with full verse search
+   14. SEARCH (Bible screen) with full verse search
    --------------------------------------------------------- */
 function initSearch(){
   const toggle = document.getElementById("search-toggle");
@@ -584,7 +611,7 @@ function navigateToChapter(book, chapter){
 }
 
 /* ---------------------------------------------------------
-   14. TOAST NOTIFICATION
+   15. TOAST NOTIFICATION
    --------------------------------------------------------- */
 function showToast(message){
   const toast = document.getElementById("toast-notification");
@@ -604,7 +631,7 @@ function showToast(message){
 }
 
 /* ---------------------------------------------------------
-   15. BOTTOM NAVIGATION
+   16. BOTTOM NAVIGATION
    --------------------------------------------------------- */
 function initNav(){
   const navButtons = document.querySelectorAll(".nav-btn");
@@ -627,7 +654,7 @@ function switchScreen(name){
 }
 
 /* ---------------------------------------------------------
-   16. QUIZ SCREEN
+   17. QUIZ SCREEN
    --------------------------------------------------------- */
 function initQuiz(){
   const catButtons = document.querySelectorAll(".quiz-cat-btn");
@@ -732,7 +759,7 @@ function shuffle(arr){
 }
 
 /* ---------------------------------------------------------
-   17. DICTIONARY SCREEN
+   18. DICTIONARY SCREEN
    --------------------------------------------------------- */
 function initDictionary(){
   const input = document.getElementById("dict-search-input");
@@ -776,7 +803,7 @@ function renderDictionary(entries){
 }
 
 /* ---------------------------------------------------------
-   18. SETTINGS SCREEN - Theme, Font & Font Size
+   19. SETTINGS SCREEN - Theme, Font & Font Size
    --------------------------------------------------------- */
 function initSettings(){
   const themeButtons = document.querySelectorAll(".theme-btn");
@@ -866,7 +893,7 @@ function loadSavedPreferences(){
 }
 
 /* ---------------------------------------------------------
-   19. UTILITIES
+   20. UTILITIES
    --------------------------------------------------------- */
 function escapeHtml(str){
   const div = document.createElement("div");
@@ -875,7 +902,7 @@ function escapeHtml(str){
 }
 
 /* ---------------------------------------------------------
-   20. PWA SERVICE WORKER REGISTRATION
+   21. PWA SERVICE WORKER REGISTRATION
    --------------------------------------------------------- */
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
