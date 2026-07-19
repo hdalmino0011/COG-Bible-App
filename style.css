@@ -337,20 +337,25 @@ input::-webkit-calendar-picker-indicator {
   transition: background 0.3s ease;
 }
 
+/* HEADER ROW - FIXED: solid background to prevent text bleeding through */
 .reading-header-row{
   position:sticky;
   top:0;
   display:grid;
   grid-template-columns: 1fr 1fr;
   background:var(--ivory);
-  z-index:3;
+  z-index:10;
   border-bottom:2px solid var(--gold);
   margin-bottom:4px;
+  padding-bottom:0;
   transition: background 0.3s ease, border-color 0.3s ease;
+  /* Ensure solid background coverage */
+  background-color: var(--ivory) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .reading-col-header{
-  padding:6px 12px 12px;
+  padding:6px 12px 10px;
   font-family:'Playfair Display', serif;
   font-weight:600;
   font-size:14.5px;
@@ -359,6 +364,8 @@ input::-webkit-calendar-picker-indicator {
   align-items:center;
   gap:8px;
   transition: color 0.3s ease;
+  background:var(--ivory);
+  background-color: var(--ivory) !important;
 }
 
 .reading-col-header-ceb{
@@ -381,12 +388,14 @@ input::-webkit-calendar-picker-indicator {
   color:#fff;
   padding:2px 6px;
   border-radius:4px;
+  flex-shrink:0;
 }
 
 /* Rows */
 .verse-rows{
   display:flex;
   flex-direction:column;
+  padding-top:2px;
 }
 
 .verse-row{
@@ -951,7 +960,7 @@ input::-webkit-calendar-picker-indicator {
     min-width: 20px;
     font-size: 11px;
   }
-  .reading-col-header{ padding:6px 6px 12px; font-size:12.5px; }
+  .reading-col-header{ padding:6px 6px 10px; font-size:12.5px; }
   .topbar-title{ font-size:18px; }
   .quiz-stats{ gap:8px; }
   .stat-value{ font-size:20px; }
