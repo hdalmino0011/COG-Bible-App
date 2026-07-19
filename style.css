@@ -335,27 +335,40 @@ input::-webkit-calendar-picker-indicator {
   padding:14px 10px 100px;
   -webkit-overflow-scrolling:touch;
   transition: background 0.3s ease;
+  position:relative;
 }
 
-/* HEADER ROW - FIXED: solid background to prevent text bleeding through */
+/* =========================================================
+   HEADER ROW - COMPLETELY FIXED WITH SOLID BACKGROUND
+   ========================================================= */
 .reading-header-row{
   position:sticky;
   top:0;
   display:grid;
   grid-template-columns: 1fr 1fr;
-  background:var(--ivory);
-  z-index:10;
+  z-index:20;
   border-bottom:2px solid var(--gold);
-  margin-bottom:4px;
-  padding-bottom:0;
+  margin-bottom:6px;
   transition: background 0.3s ease, border-color 0.3s ease;
-  /* Ensure solid background coverage */
+  
+  /* CRITICAL FIX: Solid background that covers everything underneath */
+  background-color: var(--ivory);
+  background: var(--ivory);
+  background: var(--ivory) !important;
   background-color: var(--ivory) !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  
+  /* Ensure no transparency */
+  opacity: 1;
+  
+  /* Extra protection with backdrop */
+  backdrop-filter: none;
+  
+  /* Shadow for separation from verses */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
 }
 
 .reading-col-header{
-  padding:6px 12px 10px;
+  padding:8px 12px 10px;
   font-family:'Playfair Display', serif;
   font-weight:600;
   font-size:14.5px;
@@ -364,8 +377,13 @@ input::-webkit-calendar-picker-indicator {
   align-items:center;
   gap:8px;
   transition: color 0.3s ease;
-  background:var(--ivory);
+  
+  /* CRITICAL FIX: Solid background for each cell */
+  background-color: var(--ivory);
+  background: var(--ivory);
+  background: var(--ivory) !important;
   background-color: var(--ivory) !important;
+  opacity: 1;
 }
 
 .reading-col-header-ceb{
@@ -396,6 +414,8 @@ input::-webkit-calendar-picker-indicator {
   display:flex;
   flex-direction:column;
   padding-top:2px;
+  position:relative;
+  z-index:1;
 }
 
 .verse-row{
@@ -405,6 +425,7 @@ input::-webkit-calendar-picker-indicator {
   cursor:pointer;
   transition: background 0.2s ease, border-color 0.3s ease;
   border-radius:4px;
+  position:relative;
 }
 .verse-row:last-child{ border-bottom:none; }
 .verse-row:hover{ background:rgba(201,162,39,0.06); }
@@ -960,7 +981,10 @@ input::-webkit-calendar-picker-indicator {
     min-width: 20px;
     font-size: 11px;
   }
-  .reading-col-header{ padding:6px 6px 10px; font-size:12.5px; }
+  .reading-col-header{ 
+    padding:6px 6px 10px; 
+    font-size:12.5px;
+  }
   .topbar-title{ font-size:18px; }
   .quiz-stats{ gap:8px; }
   .stat-value{ font-size:20px; }
