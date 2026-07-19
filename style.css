@@ -29,6 +29,13 @@
 
   /* Font variable for dynamic font switching */
   --app-font: 'Roboto', sans-serif;
+
+  /* Font size variables */
+  --font-size-base: 15.5px;
+  --font-size-small: 13px;
+  --font-size-medium: 15.5px;
+  --font-size-large: 18px;
+  --font-size-xlarge: 21px;
 }
 
 /* =========================================================
@@ -160,27 +167,15 @@ input{ font-family:inherit; }
   text-align:center;
 }
 
-/* Prevent dark mode from affecting splash screen text */
-body.theme-dark .splash-title {
-  color: #FFFFFF !important;
-}
-
-body.theme-dark .splash-subtitle {
-  color: var(--gold-soft) !important;
-}
-
-body.theme-sepia .splash-title {
-  color: #FFFFFF !important;
-}
-
-body.theme-sepia .splash-subtitle {
-  color: var(--gold-soft) !important;
-}
-
+/* Prevent themes from affecting splash screen text */
+body.theme-dark .splash-title,
+body.theme-sepia .splash-title,
 body.theme-blue .splash-title {
   color: #FFFFFF !important;
 }
 
+body.theme-dark .splash-subtitle,
+body.theme-sepia .splash-subtitle,
 body.theme-blue .splash-subtitle {
   color: var(--gold-soft) !important;
 }
@@ -341,9 +336,11 @@ input::-webkit-calendar-picker-indicator {
   display:flex;
   flex-direction:column;
   overflow-y:auto;
-  padding:0 10px 100px;
+  padding:0 10px 80px;
   scroll-behavior: smooth;
   transition: background 0.3s ease;
+  /* Ensure both columns have same scroll behavior */
+  -webkit-overflow-scrolling: touch;
 }
 .reading-col-header{
   position:sticky; top:0;
@@ -368,17 +365,19 @@ input::-webkit-calendar-picker-indicator {
   width:1px;
   background:linear-gradient(var(--line), var(--gold), var(--line));
   flex-shrink:0;
+  margin:0 2px;
 }
 
-/* Verse list - font will be controlled by JavaScript */
+/* Verse list - font size controlled by JS */
 .verse-list{ 
   display:flex; 
   flex-direction:column; 
   gap:2px;
   font-family: var(--app-font);
+  font-size: var(--font-size-base);
 }
 .verse-item{
-  font-size:15.5px;
+  font-size: inherit;
   line-height:1.7;
   padding:6px 8px;
   border-radius:4px;
@@ -391,7 +390,18 @@ input::-webkit-calendar-picker-indicator {
 .verse-item:last-child{ border-bottom:none; }
 .verse-item:hover{ background:rgba(201,162,39,0.06); }
 
-/* Verse highlight colors */
+/* Font size classes */
+body.font-size-small .verse-list { --font-size-base: var(--font-size-small); }
+body.font-size-medium .verse-list { --font-size-base: var(--font-size-medium); }
+body.font-size-large .verse-list { --font-size-base: var(--font-size-large); }
+body.font-size-xlarge .verse-list { --font-size-base: var(--font-size-xlarge); }
+
+/* Apply font size to verse items */
+.verse-item {
+  font-size: var(--font-size-base);
+}
+
+/* Verse highlight colors - FIXED with !important */
 .verse-item.highlight-yellow{ background:#FFD700 !important; }
 .verse-item.highlight-pink{ background:#FFB6C1 !important; }
 .verse-item.highlight-green{ background:#98FB98 !important; }
@@ -401,6 +411,7 @@ input::-webkit-calendar-picker-indicator {
 .verse-item.selected{
   outline: 2px solid var(--gold);
   outline-offset: -2px;
+  background: rgba(201,162,39,0.12) !important;
 }
 
 .verse-num{
@@ -417,6 +428,39 @@ input::-webkit-calendar-picker-indicator {
   font-style:italic;
   font-size:14px;
   padding:20px 0;
+}
+
+/* =========================================================
+   TOAST NOTIFICATION (bottom center)
+   ========================================================= */
+.toast-notification {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--blue-deep);
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--shadow-pop);
+  z-index: 60;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 90%;
+  text-align: center;
+}
+
+.toast-notification.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast-notification.hidden {
+  display: none !important;
 }
 
 /* =========================================================
@@ -776,23 +820,71 @@ input::-webkit-calendar-picker-indicator {
 }
 .font-btn:hover{ transform:translateY(-2px); }
 
+/* Font Size options - 4 columns */
+.font-size-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 8px;
+}
+.font-size-btn{
+  padding:10px 6px;
+  background:var(--paper);
+  border:2px solid var(--line);
+  border-radius:var(--radius-md);
+  font-size:13px;
+  font-weight:500;
+  box-shadow:var(--shadow-card);
+  transition:all 0.2s;
+  color:var(--slate);
+  text-align:center;
+}
+.font-size-btn.active{
+  border-color:var(--gold);
+  color:var(--blue-deep);
+  background:rgba(201,162,39,0.08);
+}
+.font-size-btn:hover{ transform:translateY(-2px); }
+
+/* About section - fixed layout */
 .about-card{
   background:var(--paper);
   border:1px solid var(--line);
   border-radius:var(--radius-lg);
-  padding:6px 18px;
+  padding:4px 16px;
   box-shadow:var(--shadow-card);
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 .about-row{
-  display:flex; justify-content:space-between; gap:14px;
-  padding:13px 0;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  padding:10px 0;
   border-bottom:1px solid var(--line);
-  font-size:13.5px;
+  font-size:13px;
 }
 .about-row:last-child{ border-bottom:none; }
-.about-label{ color:var(--slate-soft); }
-.about-value{ color:var(--ink); font-weight:500; text-align:right; }
+.about-label{
+  color:var(--slate-soft);
+  font-weight:500;
+  flex-shrink:0;
+  min-width:80px;
+}
+.about-value{
+  color:var(--ink);
+  font-weight:500;
+  text-align:right;
+  word-break:break-word;
+  line-height:1.4;
+}
+
+/* Special handling for church and versions rows */
+.about-row-church .about-value {
+  font-size:12.5px;
+}
+.about-row-versions .about-value {
+  font-size:12px;
+}
 
 /* =========================================================
    BOTTOM NAVIGATION
@@ -828,8 +920,8 @@ input::-webkit-calendar-picker-indicator {
    ========================================================= */
 @media (max-width: 480px){
   .reading-pane{ padding:10px 4px 0; }
-  .reading-col{ padding:0 8px 100px; }
-  .verse-item{ font-size:14.5px; }
+  .reading-col{ padding:0 6px 80px; }
+  .verse-item{ font-size: var(--font-size-base); }
   .topbar-title{ font-size:18px; }
   .quiz-stats{ gap:8px; }
   .stat-value{ font-size:20px; }
@@ -843,11 +935,33 @@ input::-webkit-calendar-picker-indicator {
   .theme-options, .font-options {
     grid-template-columns: 1fr 1fr;
   }
+  .font-size-options {
+    grid-template-columns: 1fr 1fr;
+  }
+  .toast-notification {
+    bottom: 80px;
+    font-size: 12px;
+    padding: 8px 16px;
+    white-space: normal;
+  }
+  .about-row {
+    font-size: 11.5px;
+    padding: 8px 0;
+  }
+  .about-label {
+    min-width: 60px;
+  }
+  .about-row-church .about-value {
+    font-size: 11px;
+  }
+  .about-row-versions .about-value {
+    font-size: 10.5px;
+  }
 }
 
 @media (min-width: 640px){
   .reading-col-header{ font-size:16px; }
-  .verse-item{ font-size:16.5px; }
+  .verse-item{ font-size: var(--font-size-base); }
 }
 
 @media (max-width: 380px) {
@@ -860,6 +974,9 @@ input::-webkit-calendar-picker-indicator {
   }
   .toolbar-group {
     justify-content: center;
+  }
+  .font-size-options {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -881,3 +998,11 @@ body.font-roboto { --app-font: 'Roboto', sans-serif; }
 body.font-times { --app-font: 'Times New Roman', Times, serif; }
 body.font-georgia { --app-font: Georgia, 'Times New Roman', serif; }
 body.font-arial { --app-font: Arial, Helvetica, sans-serif; }
+
+/* =========================================================
+   FONT SIZE STYLES (applied via JS)
+   ========================================================= */
+body.font-size-small { --font-size-base: 13px; }
+body.font-size-medium { --font-size-base: 15.5px; }
+body.font-size-large { --font-size-base: 18px; }
+body.font-size-xlarge { --font-size-base: 21px; }
