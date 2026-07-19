@@ -99,6 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initDictionary();
   initSettings();
   renderVerses("John", 1); // default view
+  registerServiceWorker(); // Register PWA service worker
 });
 
 /* ---------------------------------------------------------
@@ -400,4 +401,23 @@ function escapeHtml(str){
   const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
+}
+
+/* ---------------------------------------------------------
+   16. PWA SERVICE WORKER REGISTRATION
+   --------------------------------------------------------- */
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(registration => {
+          console.log('Service Worker registered successfully:', registration);
+        })
+        .catch(error => {
+          console.log('Service Worker registration failed:', error);
+        });
+    });
+  } else {
+    console.log('Service Workers not supported in this browser.');
+  }
 }
