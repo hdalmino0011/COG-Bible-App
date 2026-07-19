@@ -101,6 +101,32 @@ input{ font-family:inherit; }
   padding:8px;
 }
 
+/* Splash screen text colors - forced to stay white/gold */
+.splash-title{
+  font-family:'Playfair Display', serif;
+  font-weight:700;
+  font-size:clamp(26px, 6vw, 32px);
+  color:#FFFFFF !important;
+  text-align:center;
+}
+
+.splash-subtitle{
+  margin-top:6px;
+  font-size:14px;
+  letter-spacing:0.5px;
+  color:var(--gold-soft) !important;
+  text-align:center;
+}
+
+/* Prevent dark mode from affecting splash screen text */
+body.theme-dark .splash-title {
+  color: #FFFFFF !important;
+}
+
+body.theme-dark .splash-subtitle {
+  color: var(--gold-soft) !important;
+}
+
 /* =========================================================
    APP SHELL
    ========================================================= */
