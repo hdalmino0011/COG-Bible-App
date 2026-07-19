@@ -90,11 +90,12 @@ const state = {
   quizSession: null,
   currentBook: "John",
   currentChapter: 1,
-  selectedVerse: null,       // { book, chapter, verse, index, cebuanoEl, englishEl }
+  selectedVerse: null,
   highlightColor: null,
   theme: "light",
   font: "Roboto",
-  fontSize: "medium"
+  fontSize: "medium",
+  isSyncing: false
 };
 
 /* ---------------------------------------------------------
@@ -191,13 +192,11 @@ function renderVerses(book, chapter){
     const msg = `<div class="verse-empty">Text for ${escapeHtml(book)} ${chapter} isn't loaded in this sample yet. Try John 1 or Psalms 23.</div>`;
     cebList.innerHTML = msg;
     engList.innerHTML = msg;
-    // Hide toolbar when no data
     document.getElementById("verse-toolbar").classList.add("hidden");
     return;
   }
 
   data.forEach((verse, index) => {
-    // Cebuano column
     const cebDiv = document.createElement("div");
     cebDiv.className = "verse-item";
     cebDiv.dataset.verse = verse.v;
@@ -207,7 +206,6 @@ function renderVerses(book, chapter){
     cebDiv.innerHTML = `<span class="verse-num">${verse.v}</span>${escapeHtml(verse.ceb)}`;
     cebList.appendChild(cebDiv);
 
-    // English column
     const engDiv = document.createElement("div");
     engDiv.className = "verse-item";
     engDiv.dataset.verse = verse.v;
@@ -217,10 +215,8 @@ function renderVerses(book, chapter){
     engDiv.innerHTML = `<span class="verse-num">${verse.v}</span>${escapeHtml(verse.en)}`;
     engList.appendChild(engDiv);
 
-    // Click handler for verse selection (both columns)
     [cebDiv, engDiv].forEach(el => {
       el.addEventListener("click", (e) => {
-        // Find the matching element in the other column
         const idx = el.dataset.index;
         const cebEl = document.querySelector(`#verse-list-cebuano .verse-item[data-index="${idx}"]`);
         const engEl = document.querySelector(`#verse-list-english .verse-item[data-index="${idx}"]`);
@@ -229,19 +225,15 @@ function renderVerses(book, chapter){
     });
   });
 
-  // Clear any selection
   state.selectedVerse = null;
   document.getElementById("verse-toolbar").classList.add("hidden");
-
-  // Load highlights after rendering
-  loadHighlights();
+  setTimeout(loadHighlights, 100);
 }
 
 /* ---------------------------------------------------------
    10. VERSE SELECTION, HIGHLIGHT & COPY
    --------------------------------------------------------- */
 function selectVerse(cebuanoEl, englishEl, book, chapter, verseNum, index){
-  // Deselect previous
   document.querySelectorAll(".verse-item.selected").forEach(el => el.classList.remove("selected"));
   
   if (cebuanoEl) cebuanoEl.classList.add("selected");
@@ -256,13 +248,10 @@ function selectVerse(cebuanoEl, englishEl, book, chapter, verseNum, index){
     englishEl: englishEl
   };
   
-  // Show toolbar
-  const toolbar = document.getElementById("verse-toolbar");
-  toolbar.classList.remove("hidden");
+  document.getElementById("verse-toolbar").classList.remove("hidden");
 }
 
 function initVerseToolbar(){
-  // Highlight buttons
   document.querySelectorAll(".highlight-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const color = btn.dataset.color;
@@ -270,7 +259,6 @@ function initVerseToolbar(){
     });
   });
   
-  // Copy buttons
   document.querySelectorAll(".copy-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const version = btn.dataset.version;
@@ -278,7 +266,6 @@ function initVerseToolbar(){
     });
   });
   
-  // Close toolbar
   document.getElementById("toolbar-close").addEventListener("click", () => {
     document.getElementById("verse-toolbar").classList.add("hidden");
     document.querySelectorAll(".verse-item.selected").forEach(el => el.classList.remove("selected"));
@@ -287,14 +274,17 @@ function initVerseToolbar(){
 }
 
 function applyHighlight(color){
-  if (!state.selectedVerse) return;
+  if (!state.selectedVerse) {
+    showToast("Please select a verse first");
+    return;
+  }
   
   const { cebuanoEl, englishEl } = state.selectedVerse;
   
-  // Remove existing highlight classes from both
+  const highlightClasses = ["highlight-yellow", "highlight-pink", "highlight-green", "highlight-blue"];
   [cebuanoEl, englishEl].forEach(el => {
     if (el) {
-      el.classList.remove("highlight-yellow", "highlight-pink", "highlight-green", "highlight-blue");
+      highlightClasses.forEach(cls => el.classList.remove(cls));
       if (color !== "none") {
         el.classList.add(`highlight-${color}`);
       }
@@ -302,13 +292,20 @@ function applyHighlight(color){
   });
   
   state.highlightColor = color === "none" ? null : color;
-  
-  // Save highlights to localStorage
   saveHighlights();
+  
+  if (color !== "none") {
+    showToast(`✓ Highlighted with ${color}`);
+  } else {
+    showToast("✓ Highlight cleared");
+  }
 }
 
 function copyVerse(version){
-  if (!state.selectedVerse) return;
+  if (!state.selectedVerse) {
+    showToast("Please select a verse first");
+    return;
+  }
   
   const { book, chapter, verse, cebuanoEl, englishEl } = state.selectedVerse;
   const reference = `${book} ${chapter}:${verse}`;
@@ -323,13 +320,12 @@ function copyVerse(version){
     text += `${reference} (English)\n${engText}`;
   }
   
-  // Clean up extra newlines
   text = text.trim();
   
-  // Copy to clipboard
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(() => {
       showCopyFeedback(version);
+      showToast("✓ Copied to clipboard!");
     }).catch(() => {
       fallbackCopy(text, version);
     });
@@ -346,6 +342,7 @@ function fallbackCopy(text, version){
   document.execCommand("copy");
   document.body.removeChild(textarea);
   showCopyFeedback(version);
+  showToast("✓ Copied to clipboard!");
 }
 
 function showCopyFeedback(version){
@@ -392,24 +389,40 @@ function loadHighlights(){
 function initSynchronizedScrolling(){
   const cebCol = document.getElementById("col-cebuano");
   const engCol = document.getElementById("col-english");
-  let isScrolling = false;
-
-  function syncScroll(source, target){
-    if (isScrolling) return;
-    isScrolling = true;
+  
+  function syncScroll(source, target) {
+    if (state.isSyncing) return;
+    state.isSyncing = true;
     
-    // Calculate scroll ratio
-    const scrollRatio = source.scrollTop / (source.scrollHeight - source.clientHeight);
-    // Apply to target
-    target.scrollTop = scrollRatio * (target.scrollHeight - target.clientHeight);
+    const sourceHeight = source.scrollHeight - source.clientHeight;
+    if (sourceHeight <= 0) {
+      state.isSyncing = false;
+      return;
+    }
     
-    // Release lock after a short delay
-    setTimeout(() => { isScrolling = false; }, 20);
+    const ratio = source.scrollTop / sourceHeight;
+    const targetHeight = target.scrollHeight - target.clientHeight;
+    target.scrollTop = ratio * targetHeight;
+    
+    requestAnimationFrame(() => {
+      state.isSyncing = false;
+    });
   }
 
-  // Use scroll event with passive option for better performance
   cebCol.addEventListener("scroll", () => syncScroll(cebCol, engCol), { passive: true });
   engCol.addEventListener("scroll", () => syncScroll(engCol, cebCol), { passive: true });
+  
+  let resizeTimeout;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      if (cebCol.scrollTop > 0 || engCol.scrollTop > 0) {
+        const source = cebCol.scrollTop > 0 ? cebCol : engCol;
+        const target = source === cebCol ? engCol : cebCol;
+        syncScroll(source, target);
+      }
+    }, 200);
+  });
 }
 
 /* ---------------------------------------------------------
@@ -424,7 +437,6 @@ function initSearch(){
   const datalist = document.getElementById("book-suggestions");
   const submitBtn = document.getElementById("search-submit");
 
-  // Populate datalist with all book names
   ALL_BOOKS.forEach(book => {
     const opt = document.createElement("option");
     opt.value = book;
@@ -436,12 +448,10 @@ function initSearch(){
     if (!bar.classList.contains("hidden")) input.focus();
   });
 
-  // Live suggestions while typing (book names only)
   input.addEventListener("input", () => {
     const term = input.value.trim().toLowerCase();
     if (!term) return;
     
-    // Check if it's a book name
     const match = ALL_BOOKS.find(b => b.toLowerCase().startsWith(term));
     if (match && match.toLowerCase() === term) {
       bookSelect.value = match;
@@ -453,7 +463,6 @@ function initSearch(){
     }
   });
 
-  // Search button - full text search with verse reference support
   submitBtn.addEventListener("click", performSearch);
   input.addEventListener("keypress", (e) => {
     if (e.key === "Enter") performSearch();
@@ -465,21 +474,17 @@ function performSearch(){
   const query = input.value.trim();
   if (!query) return;
 
-  // Check if query is in format "Book Chapter:Verse" e.g., "John 1:4"
   const verseRefMatch = query.match(/^(\d?\s*[A-Za-z]+\s*\d?)\s+(\d+):(\d+)$/i);
   if (verseRefMatch) {
-    // It's a verse reference
     const bookName = verseRefMatch[1].trim();
     const chapterNum = parseInt(verseRefMatch[2]);
     const verseNum = parseInt(verseRefMatch[3]);
     
-    // Find the book (case insensitive)
     const matchedBook = ALL_BOOKS.find(b => b.toLowerCase() === bookName.toLowerCase());
     if (matchedBook && VERSES[matchedBook] && VERSES[matchedBook][chapterNum]) {
       const verses = VERSES[matchedBook][chapterNum];
       const matchedVerse = verses.find(v => v.v === verseNum);
       if (matchedVerse) {
-        // Navigate to the verse
         navigateToVerse(matchedBook, chapterNum, verseNum);
         showToast(`✓ Found ${matchedBook} ${chapterNum}:${verseNum}`);
         return;
@@ -489,7 +494,6 @@ function performSearch(){
     return;
   }
 
-  // Check if query is in format "Book Chapter" e.g., "John 1"
   const bookChapterMatch = query.match(/^(\d?\s*[A-Za-z]+\s*\d?)\s+(\d+)$/i);
   if (bookChapterMatch) {
     const bookName = bookChapterMatch[1].trim();
@@ -504,7 +508,6 @@ function performSearch(){
     return;
   }
 
-  // Check if query is just a book name
   const bookMatch = ALL_BOOKS.find(b => b.toLowerCase() === query.toLowerCase());
   if (bookMatch) {
     navigateToChapter(bookMatch, 1);
@@ -512,7 +515,6 @@ function performSearch(){
     return;
   }
 
-  // Full text search across all verses
   const results = [];
   for (const [book, chapters] of Object.entries(VERSES)) {
     for (const [chapter, verses] of Object.entries(chapters)) {
@@ -537,30 +539,11 @@ function performSearch(){
     return;
   }
 
-  // Navigate to first result
   const first = results[0];
   navigateToVerse(first.book, first.chapter, first.verse);
   
-  // Show result count
   const msg = `Found ${results.length} result${results.length > 1 ? 's' : ''} for "${query}"`;
   showToast(msg);
-  
-  // Highlight matching verses briefly
-  setTimeout(() => {
-    const cebItems = document.querySelectorAll("#verse-list-cebuano .verse-item");
-    const engItems = document.querySelectorAll("#verse-list-english .verse-item");
-    results.forEach(r => {
-      const idx = r.verse - 1;
-      if (cebItems[idx]) {
-        cebItems[idx].style.backgroundColor = "rgba(255, 215, 0, 0.3)";
-        setTimeout(() => { cebItems[idx].style.backgroundColor = ""; }, 3000);
-      }
-      if (engItems[idx]) {
-        engItems[idx].style.backgroundColor = "rgba(255, 215, 0, 0.3)";
-        setTimeout(() => { engItems[idx].style.backgroundColor = ""; }, 3000);
-      }
-    });
-  }, 200);
 }
 
 function navigateToVerse(book, chapter, verse){
@@ -573,7 +556,6 @@ function navigateToVerse(book, chapter, verse){
   state.currentChapter = chapter;
   renderVerses(book, chapter);
   
-  // Scroll to the verse
   setTimeout(() => {
     const cebItems = document.querySelectorAll("#verse-list-cebuano .verse-item");
     const engItems = document.querySelectorAll("#verse-list-english .verse-item");
@@ -609,11 +591,9 @@ function showToast(message){
   if (!toast) return;
   toast.textContent = message;
   toast.classList.remove("hidden");
-  // Force reflow for animation
   void toast.offsetWidth;
   toast.classList.add("show");
   
-  // Auto-hide after 3 seconds
   clearTimeout(toast._timeout);
   toast._timeout = setTimeout(() => {
     toast.classList.remove("show");
@@ -633,7 +613,6 @@ function initNav(){
       const target = btn.dataset.screen;
       switchScreen(target);
       navButtons.forEach(b => b.classList.toggle("active", b === btn));
-      // Hide toolbar when switching screens
       document.getElementById("verse-toolbar").classList.add("hidden");
       document.querySelectorAll(".verse-item.selected").forEach(el => el.classList.remove("selected"));
       state.selectedVerse = null;
@@ -800,7 +779,6 @@ function renderDictionary(entries){
    18. SETTINGS SCREEN - Theme, Font & Font Size
    --------------------------------------------------------- */
 function initSettings(){
-  // Theme buttons
   const themeButtons = document.querySelectorAll(".theme-btn");
   themeButtons.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -813,7 +791,6 @@ function initSettings(){
     });
   });
 
-  // Font buttons
   const fontButtons = document.querySelectorAll(".font-btn");
   fontButtons.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -826,7 +803,6 @@ function initSettings(){
     });
   });
 
-  // Font Size buttons
   const fontSizeButtons = document.querySelectorAll(".font-size-btn");
   fontSizeButtons.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -865,7 +841,6 @@ function applyFontSize(size){
 }
 
 function loadSavedPreferences(){
-  // Load theme
   const savedTheme = localStorage.getItem("cog_theme") || "light";
   applyTheme(savedTheme);
   state.theme = savedTheme;
@@ -873,7 +848,6 @@ function loadSavedPreferences(){
     btn.classList.toggle("active", btn.dataset.theme === savedTheme);
   });
 
-  // Load font
   const savedFont = localStorage.getItem("cog_font") || "Roboto";
   applyFont(savedFont);
   state.font = savedFont;
@@ -881,7 +855,6 @@ function loadSavedPreferences(){
     btn.classList.toggle("active", btn.dataset.font === savedFont);
   });
 
-  // Load font size
   const savedFontSize = localStorage.getItem("cog_fontsize") || "medium";
   applyFontSize(savedFontSize);
   state.fontSize = savedFontSize;
@@ -889,7 +862,6 @@ function loadSavedPreferences(){
     btn.classList.toggle("active", btn.dataset.size === savedFontSize);
   });
 
-  // Load highlights
   setTimeout(loadHighlights, 300);
 }
 
