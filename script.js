@@ -90,10 +90,11 @@ const state = {
   quizSession: null,
   currentBook: "John",
   currentChapter: 1,
-  selectedVerse: null,       // { book, chapter, verse, element }
+  selectedVerse: null,       // { book, chapter, verse, index, cebuanoEl, englishEl }
   highlightColor: null,
   theme: "light",
-  font: "Roboto"
+  font: "Roboto",
+  fontSize: "medium"
 };
 
 /* ---------------------------------------------------------
@@ -190,6 +191,8 @@ function renderVerses(book, chapter){
     const msg = `<div class="verse-empty">Text for ${escapeHtml(book)} ${chapter} isn't loaded in this sample yet. Try John 1 or Psalms 23.</div>`;
     cebList.innerHTML = msg;
     engList.innerHTML = msg;
+    // Hide toolbar when no data
+    document.getElementById("verse-toolbar").classList.add("hidden");
     return;
   }
 
@@ -216,26 +219,30 @@ function renderVerses(book, chapter){
 
     // Click handler for verse selection (both columns)
     [cebDiv, engDiv].forEach(el => {
-      el.addEventListener("click", () => selectVerse(el, book, chapter, verse.v));
+      el.addEventListener("click", (e) => {
+        // Find the matching element in the other column
+        const idx = el.dataset.index;
+        const cebEl = document.querySelector(`#verse-list-cebuano .verse-item[data-index="${idx}"]`);
+        const engEl = document.querySelector(`#verse-list-english .verse-item[data-index="${idx}"]`);
+        selectVerse(cebEl, engEl, book, chapter, verse.v, idx);
+      });
     });
   });
 
   // Clear any selection
   state.selectedVerse = null;
   document.getElementById("verse-toolbar").classList.add("hidden");
+
+  // Load highlights after rendering
+  loadHighlights();
 }
 
 /* ---------------------------------------------------------
    10. VERSE SELECTION, HIGHLIGHT & COPY
    --------------------------------------------------------- */
-function selectVerse(element, book, chapter, verseNum){
+function selectVerse(cebuanoEl, englishEl, book, chapter, verseNum, index){
   // Deselect previous
   document.querySelectorAll(".verse-item.selected").forEach(el => el.classList.remove("selected"));
-  
-  // Select both Cebuano and English versions of this verse
-  const index = element.dataset.index;
-  const cebuanoEl = document.querySelector(`#verse-list-cebuano .verse-item[data-index="${index}"]`);
-  const englishEl = document.querySelector(`#verse-list-english .verse-item[data-index="${index}"]`);
   
   if (cebuanoEl) cebuanoEl.classList.add("selected");
   if (englishEl) englishEl.classList.add("selected");
@@ -284,15 +291,13 @@ function applyHighlight(color){
   
   const { cebuanoEl, englishEl } = state.selectedVerse;
   
-  // Remove existing highlight classes
+  // Remove existing highlight classes from both
   [cebuanoEl, englishEl].forEach(el => {
     if (el) {
       el.classList.remove("highlight-yellow", "highlight-pink", "highlight-green", "highlight-blue");
-      if (color === "none") {
-        // Clear highlight
-        return;
+      if (color !== "none") {
+        el.classList.add(`highlight-${color}`);
       }
-      el.classList.add(`highlight-${color}`);
     }
   });
   
@@ -322,25 +327,34 @@ function copyVerse(version){
   text = text.trim();
   
   // Copy to clipboard
-  navigator.clipboard.writeText(text).then(() => {
-    // Show feedback
-    const btn = document.querySelector(`.copy-btn[data-version="${version}"]`);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showCopyFeedback(version);
+    }).catch(() => {
+      fallbackCopy(text, version);
+    });
+  } else {
+    fallbackCopy(text, version);
+  }
+}
+
+function fallbackCopy(text, version){
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+  showCopyFeedback(version);
+}
+
+function showCopyFeedback(version){
+  const btn = document.querySelector(`.copy-btn[data-version="${version}"]`);
+  if (btn) {
     const originalText = btn.textContent;
     btn.textContent = "✓ Copied!";
     setTimeout(() => { btn.textContent = originalText; }, 1500);
-  }).catch(() => {
-    // Fallback
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand("copy");
-    document.body.removeChild(textarea);
-    const btn = document.querySelector(`.copy-btn[data-version="${version}"]`);
-    const originalText = btn.textContent;
-    btn.textContent = "✓ Copied!";
-    setTimeout(() => { btn.textContent = originalText; }, 1500);
-  });
+  }
 }
 
 /* ---------------------------------------------------------
@@ -350,9 +364,9 @@ function saveHighlights(){
   const highlights = {};
   document.querySelectorAll(".verse-item.highlight-yellow, .verse-item.highlight-pink, .verse-item.highlight-green, .verse-item.highlight-blue").forEach(el => {
     const key = `${el.dataset.book}|${el.dataset.chapter}|${el.dataset.verse}`;
-    const color = el.classList.toString().match(/highlight-\w+/);
-    if (color) {
-      highlights[key] = color[0].replace("highlight-", "");
+    const colorMatch = el.className.match(/highlight-\w+/);
+    if (colorMatch) {
+      highlights[key] = colorMatch[0].replace("highlight-", "");
     }
   });
   localStorage.setItem("cog_highlights", JSON.stringify(highlights));
@@ -373,7 +387,7 @@ function loadHighlights(){
 }
 
 /* ---------------------------------------------------------
-   12. SYNCHRONIZED SCROLLING
+   12. SYNCHRONIZED SCROLLING - FIXED
    --------------------------------------------------------- */
 function initSynchronizedScrolling(){
   const cebCol = document.getElementById("col-cebuano");
@@ -383,17 +397,23 @@ function initSynchronizedScrolling(){
   function syncScroll(source, target){
     if (isScrolling) return;
     isScrolling = true;
-    const ratio = source.scrollTop / (source.scrollHeight - source.clientHeight);
-    target.scrollTop = ratio * (target.scrollHeight - target.clientHeight);
-    setTimeout(() => { isScrolling = false; }, 10);
+    
+    // Calculate scroll ratio
+    const scrollRatio = source.scrollTop / (source.scrollHeight - source.clientHeight);
+    // Apply to target
+    target.scrollTop = scrollRatio * (target.scrollHeight - target.clientHeight);
+    
+    // Release lock after a short delay
+    setTimeout(() => { isScrolling = false; }, 20);
   }
 
-  cebCol.addEventListener("scroll", () => syncScroll(cebCol, engCol));
-  engCol.addEventListener("scroll", () => syncScroll(engCol, cebCol));
+  // Use scroll event with passive option for better performance
+  cebCol.addEventListener("scroll", () => syncScroll(cebCol, engCol), { passive: true });
+  engCol.addEventListener("scroll", () => syncScroll(engCol, cebCol), { passive: true });
 }
 
 /* ---------------------------------------------------------
-   13. SEARCH (Bible screen) with suggestions
+   13. SEARCH (Bible screen) with full verse search
    --------------------------------------------------------- */
 function initSearch(){
   const toggle = document.getElementById("search-toggle");
@@ -416,28 +436,24 @@ function initSearch(){
     if (!bar.classList.contains("hidden")) input.focus();
   });
 
-  // Live suggestions while typing
+  // Live suggestions while typing (book names only)
   input.addEventListener("input", () => {
     const term = input.value.trim().toLowerCase();
     if (!term) return;
     
     // Check if it's a book name
     const match = ALL_BOOKS.find(b => b.toLowerCase().startsWith(term));
-    if (match){
-      // Show suggestion in datalist (already populated)
-      // Optionally auto-select if exact match
-      if (match.toLowerCase() === term) {
-        bookSelect.value = match;
-        populateChapters(1);
-        state.currentBook = match;
-        state.currentChapter = 1;
-        chapterSelect.value = 1;
-        renderVerses(match, 1);
-      }
+    if (match && match.toLowerCase() === term) {
+      bookSelect.value = match;
+      populateChapters(1);
+      state.currentBook = match;
+      state.currentChapter = 1;
+      chapterSelect.value = 1;
+      renderVerses(match, 1);
     }
   });
 
-  // Search button - full text search (basic implementation)
+  // Search button - full text search with verse reference support
   submitBtn.addEventListener("click", performSearch);
   input.addEventListener("keypress", (e) => {
     if (e.key === "Enter") performSearch();
@@ -446,16 +462,63 @@ function initSearch(){
 
 function performSearch(){
   const input = document.getElementById("verse-search-input");
-  const term = input.value.trim().toLowerCase();
-  if (!term) return;
+  const query = input.value.trim();
+  if (!query) return;
 
-  // Search across all verses
+  // Check if query is in format "Book Chapter:Verse" e.g., "John 1:4"
+  const verseRefMatch = query.match(/^(\d?\s*[A-Za-z]+\s*\d?)\s+(\d+):(\d+)$/i);
+  if (verseRefMatch) {
+    // It's a verse reference
+    const bookName = verseRefMatch[1].trim();
+    const chapterNum = parseInt(verseRefMatch[2]);
+    const verseNum = parseInt(verseRefMatch[3]);
+    
+    // Find the book (case insensitive)
+    const matchedBook = ALL_BOOKS.find(b => b.toLowerCase() === bookName.toLowerCase());
+    if (matchedBook && VERSES[matchedBook] && VERSES[matchedBook][chapterNum]) {
+      const verses = VERSES[matchedBook][chapterNum];
+      const matchedVerse = verses.find(v => v.v === verseNum);
+      if (matchedVerse) {
+        // Navigate to the verse
+        navigateToVerse(matchedBook, chapterNum, verseNum);
+        showToast(`✓ Found ${matchedBook} ${chapterNum}:${verseNum}`);
+        return;
+      }
+    }
+    showToast(`✗ "${query}" not found`);
+    return;
+  }
+
+  // Check if query is in format "Book Chapter" e.g., "John 1"
+  const bookChapterMatch = query.match(/^(\d?\s*[A-Za-z]+\s*\d?)\s+(\d+)$/i);
+  if (bookChapterMatch) {
+    const bookName = bookChapterMatch[1].trim();
+    const chapterNum = parseInt(bookChapterMatch[2]);
+    const matchedBook = ALL_BOOKS.find(b => b.toLowerCase() === bookName.toLowerCase());
+    if (matchedBook && VERSES[matchedBook] && VERSES[matchedBook][chapterNum]) {
+      navigateToChapter(matchedBook, chapterNum);
+      showToast(`✓ Found ${matchedBook} ${chapterNum}`);
+      return;
+    }
+    showToast(`✗ "${query}" not found`);
+    return;
+  }
+
+  // Check if query is just a book name
+  const bookMatch = ALL_BOOKS.find(b => b.toLowerCase() === query.toLowerCase());
+  if (bookMatch) {
+    navigateToChapter(bookMatch, 1);
+    showToast(`✓ Found ${bookMatch} 1`);
+    return;
+  }
+
+  // Full text search across all verses
   const results = [];
   for (const [book, chapters] of Object.entries(VERSES)) {
     for (const [chapter, verses] of Object.entries(chapters)) {
       verses.forEach(v => {
-        const enMatch = v.en.toLowerCase().includes(term);
-        const cebMatch = v.ceb.toLowerCase().includes(term);
+        const enMatch = v.en.toLowerCase().includes(query.toLowerCase());
+        const cebMatch = v.ceb.toLowerCase().includes(query.toLowerCase());
         if (enMatch || cebMatch) {
           results.push({
             book,
@@ -470,22 +533,19 @@ function performSearch(){
   }
 
   if (results.length === 0) {
-    alert(`No results found for "${input.value}"`);
+    showToast(`✗ No results found for "${query}"`);
     return;
   }
 
   // Navigate to first result
   const first = results[0];
-  const bookSelect = document.getElementById("book-select");
-  const chapterSelect = document.getElementById("chapter-select");
-  bookSelect.value = first.book;
-  populateChapters(first.chapter);
-  chapterSelect.value = first.chapter;
-  state.currentBook = first.book;
-  state.currentChapter = first.chapter;
-  renderVerses(first.book, first.chapter);
-
-  // Highlight matching verses
+  navigateToVerse(first.book, first.chapter, first.verse);
+  
+  // Show result count
+  const msg = `Found ${results.length} result${results.length > 1 ? 's' : ''} for "${query}"`;
+  showToast(msg);
+  
+  // Highlight matching verses briefly
   setTimeout(() => {
     const cebItems = document.querySelectorAll("#verse-list-cebuano .verse-item");
     const engItems = document.querySelectorAll("#verse-list-english .verse-item");
@@ -500,21 +560,71 @@ function performSearch(){
         setTimeout(() => { engItems[idx].style.backgroundColor = ""; }, 3000);
       }
     });
-    // Show result count
-    const msg = `Found ${results.length} result${results.length > 1 ? 's' : ''} for "${input.value}"`;
-    const note = document.createElement("div");
-    note.className = "verse-empty";
-    note.textContent = msg;
-    note.style.color = "var(--gold)";
-    note.style.fontWeight = "bold";
-    const cebList = document.getElementById("verse-list-cebuano");
-    cebList.prepend(note);
-    setTimeout(() => { note.remove(); }, 4000);
-  }, 100);
+  }, 200);
+}
+
+function navigateToVerse(book, chapter, verse){
+  const bookSelect = document.getElementById("book-select");
+  const chapterSelect = document.getElementById("chapter-select");
+  bookSelect.value = book;
+  populateChapters(chapter);
+  chapterSelect.value = chapter;
+  state.currentBook = book;
+  state.currentChapter = chapter;
+  renderVerses(book, chapter);
+  
+  // Scroll to the verse
+  setTimeout(() => {
+    const cebItems = document.querySelectorAll("#verse-list-cebuano .verse-item");
+    const engItems = document.querySelectorAll("#verse-list-english .verse-item");
+    const idx = verse - 1;
+    if (cebItems[idx]) {
+      cebItems[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      cebItems[idx].style.backgroundColor = "rgba(201, 162, 39, 0.15)";
+      setTimeout(() => { cebItems[idx].style.backgroundColor = ""; }, 2000);
+    }
+    if (engItems[idx]) {
+      engItems[idx].style.backgroundColor = "rgba(201, 162, 39, 0.15)";
+      setTimeout(() => { engItems[idx].style.backgroundColor = ""; }, 2000);
+    }
+  }, 300);
+}
+
+function navigateToChapter(book, chapter){
+  const bookSelect = document.getElementById("book-select");
+  const chapterSelect = document.getElementById("chapter-select");
+  bookSelect.value = book;
+  populateChapters(chapter);
+  chapterSelect.value = chapter;
+  state.currentBook = book;
+  state.currentChapter = chapter;
+  renderVerses(book, chapter);
 }
 
 /* ---------------------------------------------------------
-   14. BOTTOM NAVIGATION
+   14. TOAST NOTIFICATION
+   --------------------------------------------------------- */
+function showToast(message){
+  const toast = document.getElementById("toast-notification");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.remove("hidden");
+  // Force reflow for animation
+  void toast.offsetWidth;
+  toast.classList.add("show");
+  
+  // Auto-hide after 3 seconds
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => {
+      toast.classList.add("hidden");
+    }, 300);
+  }, 3000);
+}
+
+/* ---------------------------------------------------------
+   15. BOTTOM NAVIGATION
    --------------------------------------------------------- */
 function initNav(){
   const navButtons = document.querySelectorAll(".nav-btn");
@@ -538,7 +648,7 @@ function switchScreen(name){
 }
 
 /* ---------------------------------------------------------
-   15. QUIZ SCREEN
+   16. QUIZ SCREEN
    --------------------------------------------------------- */
 function initQuiz(){
   const catButtons = document.querySelectorAll(".quiz-cat-btn");
@@ -643,7 +753,7 @@ function shuffle(arr){
 }
 
 /* ---------------------------------------------------------
-   16. DICTIONARY SCREEN
+   17. DICTIONARY SCREEN
    --------------------------------------------------------- */
 function initDictionary(){
   const input = document.getElementById("dict-search-input");
@@ -687,7 +797,7 @@ function renderDictionary(entries){
 }
 
 /* ---------------------------------------------------------
-   17. SETTINGS SCREEN - Theme & Font
+   18. SETTINGS SCREEN - Theme, Font & Font Size
    --------------------------------------------------------- */
 function initSettings(){
   // Theme buttons
@@ -715,18 +825,28 @@ function initSettings(){
       localStorage.setItem("cog_font", font);
     });
   });
+
+  // Font Size buttons
+  const fontSizeButtons = document.querySelectorAll(".font-size-btn");
+  fontSizeButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      fontSizeButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const size = btn.dataset.size;
+      applyFontSize(size);
+      state.fontSize = size;
+      localStorage.setItem("cog_fontsize", size);
+    });
+  });
 }
 
 function applyTheme(theme){
-  // Remove all theme classes
   document.body.classList.remove("theme-light", "theme-dark", "theme-sepia", "theme-blue");
   document.body.classList.add(`theme-${theme}`);
 }
 
 function applyFont(font){
-  // Remove all font classes
   document.body.classList.remove("font-roboto", "font-times", "font-georgia", "font-arial");
-  // Map font names to class names
   const fontMap = {
     "Roboto": "font-roboto",
     "Times New Roman": "font-times",
@@ -736,8 +856,12 @@ function applyFont(font){
   if (fontMap[font]) {
     document.body.classList.add(fontMap[font]);
   }
-  // Update CSS variable for dynamic font
   document.documentElement.style.setProperty('--app-font', font);
+}
+
+function applyFontSize(size){
+  document.body.classList.remove("font-size-small", "font-size-medium", "font-size-large", "font-size-xlarge");
+  document.body.classList.add(`font-size-${size}`);
 }
 
 function loadSavedPreferences(){
@@ -757,12 +881,20 @@ function loadSavedPreferences(){
     btn.classList.toggle("active", btn.dataset.font === savedFont);
   });
 
+  // Load font size
+  const savedFontSize = localStorage.getItem("cog_fontsize") || "medium";
+  applyFontSize(savedFontSize);
+  state.fontSize = savedFontSize;
+  document.querySelectorAll(".font-size-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.size === savedFontSize);
+  });
+
   // Load highlights
-  loadHighlights();
+  setTimeout(loadHighlights, 300);
 }
 
 /* ---------------------------------------------------------
-   18. UTILITIES
+   19. UTILITIES
    --------------------------------------------------------- */
 function escapeHtml(str){
   const div = document.createElement("div");
@@ -771,7 +903,7 @@ function escapeHtml(str){
 }
 
 /* ---------------------------------------------------------
-   19. PWA SERVICE WORKER REGISTRATION
+   20. PWA SERVICE WORKER REGISTRATION
    --------------------------------------------------------- */
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
