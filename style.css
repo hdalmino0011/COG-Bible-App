@@ -322,161 +322,135 @@ input::-webkit-calendar-picker-indicator {
 }
 
 /* =========================================================
-   READING PANE - FIXED SYNCHRONIZED SCROLLING
+   READING PANE — UNIFIED SINGLE-SCROLL LAYOUT
+   One scroll container. Each verse is a single grid row with two
+   cells (Cebuano | English), so the two "columns" can never drift
+   out of sync — there is only one scrollbar and one flow of rows.
    ========================================================= */
 .reading-pane{
   flex:1;
   min-height:0;
-  display:flex;
-  padding:14px 10px 0;
-  overflow:hidden;
-  position:relative;
-  gap:0;
-}
-
-.reading-col{
-  flex:1;
-  min-width:0;
-  display:flex;
-  flex-direction:column;
   overflow-y:auto;
   overflow-x:hidden;
-  padding:0 10px 80px;
-  scroll-behavior: auto;
+  padding:14px 10px 100px;
+  -webkit-overflow-scrolling:touch;
   transition: background 0.3s ease;
-  -webkit-overflow-scrolling: touch;
-  /* Ensure both columns have the same height */
-  height: 100%;
-  position: relative;
+}
+
+.reading-header-row{
+  position:sticky;
+  top:0;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  background:var(--ivory);
+  z-index:3;
+  border-bottom:2px solid var(--gold);
+  margin-bottom:4px;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .reading-col-header{
-  position:sticky; 
-  top:0;
-  background:var(--ivory);
-  padding:6px 0 12px;
+  padding:6px 12px 12px;
   font-family:'Playfair Display', serif;
   font-weight:600;
   font-size:14.5px;
   color:var(--blue-deep);
-  display:flex; 
-  align-items:center; 
+  display:flex;
+  align-items:center;
   gap:8px;
-  z-index:2;
-  transition: background 0.3s ease, color 0.3s ease;
-  border-bottom: 2px solid var(--gold);
-  margin-bottom: 4px;
+  transition: color 0.3s ease;
 }
 
-.reading-col-header em{ 
-  font-style:italic; 
-  color:var(--slate-soft); 
-  font-size:12px; 
-  font-weight:400; 
+.reading-col-header-ceb{
+  border-right:1px solid var(--line);
+}
+
+.reading-col-header em{
+  font-style:italic;
+  color:var(--slate-soft);
+  font-size:12px;
+  font-weight:400;
 }
 
 .col-flag{
   font-family:'Roboto', sans-serif;
-  font-size:9px; 
-  font-weight:700; 
+  font-size:9px;
+  font-weight:700;
   letter-spacing:0.5px;
-  background:var(--blue-mid); 
+  background:var(--blue-mid);
   color:#fff;
-  padding:2px 6px; 
+  padding:2px 6px;
   border-radius:4px;
 }
 
-.reading-divider{
-  width:1px;
-  background:linear-gradient(var(--line), var(--gold), var(--line));
-  flex-shrink:0;
-  margin:0 2px;
-  position: relative;
+/* Rows */
+.verse-rows{
+  display:flex;
+  flex-direction:column;
 }
 
-/* =========================================================
-   VERSE LIST - FIXED ALIGNMENT
-   ========================================================= */
-.verse-list{ 
-  display:flex; 
-  flex-direction:column; 
-  gap:0;
-  font-family: var(--app-font);
-  font-size: var(--font-size-base);
-  padding-bottom: 20px;
-}
-
-/* Each verse item - fixed height for perfect alignment */
-.verse-item{
-  font-size: inherit;
-  line-height:1.7;
-  padding:8px 8px;
-  border-radius:4px;
+.verse-row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
   border-bottom:1px dashed var(--line);
-  color:var(--slate);
   cursor:pointer;
   transition: background 0.2s ease, border-color 0.3s ease;
-  position:relative;
-  min-height: 40px;
-  /* Ensure both columns have the same height for each verse */
-  display: flex;
-  align-items: flex-start;
+  border-radius:4px;
+}
+.verse-row:last-child{ border-bottom:none; }
+.verse-row:hover{ background:rgba(201,162,39,0.06); }
+
+.verse-cell{
+  display:flex;
+  align-items:flex-start;
+  gap:6px;
+  padding:8px 12px;
+  font-size:var(--font-size-base);
+  line-height:1.7;
+  color:var(--slate);
+  min-width:0;
 }
 
-.verse-item:last-child{ 
-  border-bottom: none; 
-}
-
-.verse-item:hover{ 
-  background:rgba(201,162,39,0.06); 
-}
-
-/* Font size classes */
-body.font-size-small .verse-list { --font-size-base: var(--font-size-small); }
-body.font-size-medium .verse-list { --font-size-base: var(--font-size-medium); }
-body.font-size-large .verse-list { --font-size-base: var(--font-size-large); }
-body.font-size-xlarge .verse-list { --font-size-base: var(--font-size-xlarge); }
-
-/* Apply font size to verse items */
-.verse-item {
-  font-size: var(--font-size-base);
-}
-
-/* Verse highlight colors */
-.verse-item.highlight-yellow{ background:#FFD700 !important; }
-.verse-item.highlight-pink{ background:#FFB6C1 !important; }
-.verse-item.highlight-green{ background:#98FB98 !important; }
-.verse-item.highlight-blue{ background:#87CEEB !important; }
-
-/* Selected verse for copying - only on long press */
-.verse-item.selected{
-  outline: 2px solid var(--gold);
-  outline-offset: -2px;
-  background: rgba(201,162,39,0.12) !important;
-  border-radius: 4px;
+.verse-cell-ceb{
+  border-right:1px solid var(--line);
 }
 
 .verse-num{
   display:inline-block;
-  min-width:28px;
+  min-width:26px;
   color:var(--gold);
   font-weight:700;
   font-size:12px;
-  margin-right:6px;
   flex-shrink:0;
   text-align:right;
 }
 
-.verse-text {
-  flex: 1;
-  word-wrap: break-word;
+.verse-text{
+  flex:1;
+  min-width:0;
+  word-wrap:break-word;
 }
 
-.verse-empty{
+.verse-row-empty{
+  padding:20px 12px;
   color:var(--slate-soft);
   font-style:italic;
   font-size:14px;
-  padding:20px 0;
+}
+
+/* Verse highlight colors — applied to the whole row so both
+   languages stay visually paired */
+.verse-row.highlight-yellow{ background:#FFD700 !important; }
+.verse-row.highlight-pink{ background:#FFB6C1 !important; }
+.verse-row.highlight-green{ background:#98FB98 !important; }
+.verse-row.highlight-blue{ background:#87CEEB !important; }
+
+/* Selected verse row for copying — only on long press */
+.verse-row.selected{
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+  background: rgba(201,162,39,0.12) !important;
+  border-radius: 4px;
 }
 
 /* =========================================================
@@ -968,17 +942,16 @@ body.font-size-xlarge .verse-list { --font-size-base: var(--font-size-xlarge); }
    RESPONSIVE
    ========================================================= */
 @media (max-width: 480px){
-  .reading-pane{ padding:10px 4px 0; }
-  .reading-col{ padding:0 6px 80px; }
-  .verse-item{ 
+  .reading-pane{ padding:10px 4px 100px; }
+  .verse-cell{
     font-size: var(--font-size-base);
-    min-height: 36px;
-    padding: 6px 4px;
+    padding: 6px 6px;
   }
   .verse-num {
-    min-width: 22px;
+    min-width: 20px;
     font-size: 11px;
   }
+  .reading-col-header{ padding:6px 6px 12px; font-size:12.5px; }
   .topbar-title{ font-size:18px; }
   .quiz-stats{ gap:8px; }
   .stat-value{ font-size:20px; }
@@ -1018,7 +991,7 @@ body.font-size-xlarge .verse-list { --font-size-base: var(--font-size-xlarge); }
 
 @media (min-width: 640px){
   .reading-col-header{ font-size:16px; }
-  .verse-item{ font-size: var(--font-size-base); }
+  .verse-cell{ font-size: var(--font-size-base); }
 }
 
 @media (max-width: 380px) {
@@ -1039,12 +1012,12 @@ body.font-size-xlarge .verse-list { --font-size-base: var(--font-size-xlarge); }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce){
-  .emblem-ring, .spinner span, .splash-inner{ animation:none !important; }
+  .spinner span, .splash-inner{ animation:none !important; }
 }
 
 /* Scrollbar (webkit) */
-.reading-col::-webkit-scrollbar, .screen-scroll::-webkit-scrollbar{ width:6px; }
-.reading-col::-webkit-scrollbar-thumb, .screen-scroll::-webkit-scrollbar-thumb{
+.reading-pane::-webkit-scrollbar, .screen-scroll::-webkit-scrollbar{ width:6px; }
+.reading-pane::-webkit-scrollbar-thumb, .screen-scroll::-webkit-scrollbar-thumb{
   background:var(--line); border-radius:6px;
 }
 
