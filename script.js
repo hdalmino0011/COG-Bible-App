@@ -90,12 +90,11 @@ const state = {
   quizSession: null,
   currentBook: "John",
   currentChapter: 1,
-  selectedVerse: null,
+  selectedVerse: null,   // { book, chapter, verse, index, rowEl }
   highlightColor: null,
   theme: "light",
   font: "Roboto",
   fontSize: "medium",
-  isSyncing: false,
   longPressTimer: null,
   isLongPress: false
 };
@@ -112,7 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initDictionary();
   initSettings();
   initVerseToolbar();
-  initSynchronizedScrolling();
   renderVerses("John", 1);
   registerServiceWorker();
   loadSavedPreferences();
@@ -180,76 +178,65 @@ function populateChapters(defaultChapter){
 }
 
 /* ---------------------------------------------------------
-   9. VERSE RENDERING with LONG PRESS support
+   9. VERSE RENDERING — unified rows (Cebuano + English in one row)
    --------------------------------------------------------- */
 function renderVerses(book, chapter){
-  const cebList = document.getElementById("verse-list-cebuano");
-  const engList = document.getElementById("verse-list-english");
+  const rowsContainer = document.getElementById("verse-rows");
   const data = VERSES[book] && VERSES[book][chapter];
 
-  cebList.innerHTML = "";
-  engList.innerHTML = "";
+  rowsContainer.innerHTML = "";
+  document.getElementById("verse-toolbar").classList.add("hidden");
+  state.selectedVerse = null;
 
   if (!data){
-    const msg = `<div class="verse-empty">Text for ${escapeHtml(book)} ${chapter} isn't loaded in this sample yet. Try John 1 or Psalms 23.</div>`;
-    cebList.innerHTML = msg;
-    engList.innerHTML = msg;
-    document.getElementById("verse-toolbar").classList.add("hidden");
+    rowsContainer.innerHTML =
+      `<div class="verse-row-empty">Text for ${escapeHtml(book)} ${chapter} isn't loaded in this sample yet. Try John 1 or Psalms 23.</div>`;
     return;
   }
 
   data.forEach((verse, index) => {
-    // Cebuano column
-    const cebDiv = document.createElement("div");
-    cebDiv.className = "verse-item";
-    cebDiv.dataset.verse = verse.v;
-    cebDiv.dataset.index = index;
-    cebDiv.dataset.book = book;
-    cebDiv.dataset.chapter = chapter;
-    cebDiv.innerHTML = `<span class="verse-num">${verse.v}</span><span class="verse-text">${escapeHtml(verse.ceb)}</span>`;
-    cebList.appendChild(cebDiv);
+    const row = document.createElement("div");
+    row.className = "verse-row";
+    row.dataset.verse = verse.v;
+    row.dataset.index = index;
+    row.dataset.book = book;
+    row.dataset.chapter = chapter;
 
-    // English column
-    const engDiv = document.createElement("div");
-    engDiv.className = "verse-item";
-    engDiv.dataset.verse = verse.v;
-    engDiv.dataset.index = index;
-    engDiv.dataset.book = book;
-    engDiv.dataset.chapter = chapter;
-    engDiv.innerHTML = `<span class="verse-num">${verse.v}</span><span class="verse-text">${escapeHtml(verse.en)}</span>`;
-    engList.appendChild(engDiv);
+    row.innerHTML = `
+      <div class="verse-cell verse-cell-ceb">
+        <span class="verse-num">${verse.v}</span>
+        <span class="verse-text">${escapeHtml(verse.ceb)}</span>
+      </div>
+      <div class="verse-cell verse-cell-eng">
+        <span class="verse-num">${verse.v}</span>
+        <span class="verse-text">${escapeHtml(verse.en)}</span>
+      </div>
+    `;
 
-    // Long press handler for both columns
-    [cebDiv, engDiv].forEach(el => {
-      // Long press to select verse and show toolbar
-      el.addEventListener("mousedown", (e) => startLongPress(e, el, book, chapter, verse.v, index));
-      el.addEventListener("mouseup", () => clearLongPress());
-      el.addEventListener("mouseleave", () => clearLongPress());
-      el.addEventListener("touchstart", (e) => startLongPress(e, el, book, chapter, verse.v, index), { passive: true });
-      el.addEventListener("touchend", () => clearLongPress());
-      el.addEventListener("touchmove", () => clearLongPress());
-    });
+    // Long press on the whole row selects it (both languages together)
+    row.addEventListener("mousedown", (e) => startLongPress(e, row, book, chapter, verse.v, index));
+    row.addEventListener("mouseup", () => clearLongPress());
+    row.addEventListener("mouseleave", () => clearLongPress());
+    row.addEventListener("touchstart", (e) => startLongPress(e, row, book, chapter, verse.v, index), { passive: true });
+    row.addEventListener("touchend", () => clearLongPress());
+    row.addEventListener("touchmove", () => clearLongPress());
+
+    rowsContainer.appendChild(row);
   });
 
-  state.selectedVerse = null;
-  document.getElementById("verse-toolbar").classList.add("hidden");
   setTimeout(loadHighlights, 100);
 }
 
 /* ---------------------------------------------------------
    10. LONG PRESS HANDLING
    --------------------------------------------------------- */
-function startLongPress(e, element, book, chapter, verseNum, index){
+function startLongPress(e, rowEl, book, chapter, verseNum, index){
   state.isLongPress = false;
   clearTimeout(state.longPressTimer);
-  
+
   state.longPressTimer = setTimeout(() => {
     state.isLongPress = true;
-    // Select the verse on long press
-    const idx = element.dataset.index;
-    const cebEl = document.querySelector(`#verse-list-cebuano .verse-item[data-index="${idx}"]`);
-    const engEl = document.querySelector(`#verse-list-english .verse-item[data-index="${idx}"]`);
-    selectVerse(cebEl, engEl, book, chapter, verseNum, idx);
+    selectVerse(rowEl, book, chapter, verseNum, index);
   }, 500);
 }
 
@@ -260,21 +247,13 @@ function clearLongPress(){
 /* ---------------------------------------------------------
    11. VERSE SELECTION, HIGHLIGHT & COPY
    --------------------------------------------------------- */
-function selectVerse(cebuanoEl, englishEl, book, chapter, verseNum, index){
-  document.querySelectorAll(".verse-item.selected").forEach(el => el.classList.remove("selected"));
-  
-  if (cebuanoEl) cebuanoEl.classList.add("selected");
-  if (englishEl) englishEl.classList.add("selected");
-  
-  state.selectedVerse = {
-    book,
-    chapter,
-    verse: verseNum,
-    index: index,
-    cebuanoEl: cebuanoEl,
-    englishEl: englishEl
-  };
-  
+function selectVerse(rowEl, book, chapter, verseNum, index){
+  document.querySelectorAll(".verse-row.selected").forEach(el => el.classList.remove("selected"));
+
+  if (rowEl) rowEl.classList.add("selected");
+
+  state.selectedVerse = { book, chapter, verse: verseNum, index, rowEl };
+
   document.getElementById("verse-toolbar").classList.remove("hidden");
 }
 
@@ -285,17 +264,17 @@ function initVerseToolbar(){
       applyHighlight(color);
     });
   });
-  
+
   document.querySelectorAll(".copy-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const version = btn.dataset.version;
       copyVerse(version);
     });
   });
-  
+
   document.getElementById("toolbar-close").addEventListener("click", () => {
     document.getElementById("verse-toolbar").classList.add("hidden");
-    document.querySelectorAll(".verse-item.selected").forEach(el => el.classList.remove("selected"));
+    document.querySelectorAll(".verse-row.selected").forEach(el => el.classList.remove("selected"));
     state.selectedVerse = null;
   });
 }
@@ -305,22 +284,20 @@ function applyHighlight(color){
     showToast("Please long press a verse first");
     return;
   }
-  
-  const { cebuanoEl, englishEl } = state.selectedVerse;
-  
+
+  const { rowEl } = state.selectedVerse;
   const highlightClasses = ["highlight-yellow", "highlight-pink", "highlight-green", "highlight-blue"];
-  [cebuanoEl, englishEl].forEach(el => {
-    if (el) {
-      highlightClasses.forEach(cls => el.classList.remove(cls));
-      if (color !== "none") {
-        el.classList.add(`highlight-${color}`);
-      }
+
+  if (rowEl) {
+    highlightClasses.forEach(cls => rowEl.classList.remove(cls));
+    if (color !== "none") {
+      rowEl.classList.add(`highlight-${color}`);
     }
-  });
-  
+  }
+
   state.highlightColor = color === "none" ? null : color;
   saveHighlights();
-  
+
   if (color !== "none") {
     showToast(`✓ Highlighted with ${color}`);
   } else {
@@ -333,22 +310,22 @@ function copyVerse(version){
     showToast("Please long press a verse first");
     return;
   }
-  
-  const { book, chapter, verse, cebuanoEl, englishEl } = state.selectedVerse;
+
+  const { book, chapter, verse, rowEl } = state.selectedVerse;
   const reference = `${book} ${chapter}:${verse}`;
-  
+
   let text = "";
   if (version === "cebuano" || version === "both") {
-    const cebText = cebuanoEl ? cebuanoEl.querySelector('.verse-text')?.textContent || "" : "";
+    const cebText = rowEl ? rowEl.querySelector(".verse-cell-ceb .verse-text")?.textContent || "" : "";
     text += `${reference} (Cebuano)\n${cebText}\n\n`;
   }
   if (version === "english" || version === "both") {
-    const engText = englishEl ? englishEl.querySelector('.verse-text')?.textContent || "" : "";
+    const engText = rowEl ? rowEl.querySelector(".verse-cell-eng .verse-text")?.textContent || "" : "";
     text += `${reference} (English)\n${engText}`;
   }
-  
+
   text = text.trim();
-  
+
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(() => {
       showCopyFeedback(version);
@@ -386,7 +363,9 @@ function showCopyFeedback(version){
    --------------------------------------------------------- */
 function saveHighlights(){
   const highlights = {};
-  document.querySelectorAll(".verse-item.highlight-yellow, .verse-item.highlight-pink, .verse-item.highlight-green, .verse-item.highlight-blue").forEach(el => {
+  document.querySelectorAll(
+    ".verse-row.highlight-yellow, .verse-row.highlight-pink, .verse-row.highlight-green, .verse-row.highlight-blue"
+  ).forEach(el => {
     const key = `${el.dataset.book}|${el.dataset.chapter}|${el.dataset.verse}`;
     const colorMatch = el.className.match(/highlight-\w+/);
     if (colorMatch) {
@@ -401,7 +380,7 @@ function loadHighlights(){
   if (!data) return;
   try {
     const highlights = JSON.parse(data);
-    document.querySelectorAll(".verse-item").forEach(el => {
+    document.querySelectorAll(".verse-row").forEach(el => {
       const key = `${el.dataset.book}|${el.dataset.chapter}|${el.dataset.verse}`;
       if (highlights[key]) {
         el.classList.add(`highlight-${highlights[key]}`);
@@ -411,49 +390,7 @@ function loadHighlights(){
 }
 
 /* ---------------------------------------------------------
-   13. SYNCHRONIZED SCROLLING - FIXED
-   --------------------------------------------------------- */
-function initSynchronizedScrolling(){
-  const cebCol = document.getElementById("col-cebuano");
-  const engCol = document.getElementById("col-english");
-  
-  function syncScroll(source, target) {
-    if (state.isSyncing) return;
-    state.isSyncing = true;
-    
-    const sourceHeight = source.scrollHeight - source.clientHeight;
-    if (sourceHeight <= 0) {
-      state.isSyncing = false;
-      return;
-    }
-    
-    const ratio = source.scrollTop / sourceHeight;
-    const targetHeight = target.scrollHeight - target.clientHeight;
-    target.scrollTop = ratio * targetHeight;
-    
-    requestAnimationFrame(() => {
-      state.isSyncing = false;
-    });
-  }
-
-  cebCol.addEventListener("scroll", () => syncScroll(cebCol, engCol), { passive: true });
-  engCol.addEventListener("scroll", () => syncScroll(engCol, cebCol), { passive: true });
-  
-  let resizeTimeout;
-  window.addEventListener("resize", () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      if (cebCol.scrollTop > 0 || engCol.scrollTop > 0) {
-        const source = cebCol.scrollTop > 0 ? cebCol : engCol;
-        const target = source === cebCol ? engCol : cebCol;
-        syncScroll(source, target);
-      }
-    }, 200);
-  });
-}
-
-/* ---------------------------------------------------------
-   14. SEARCH (Bible screen) with full verse search
+   13. SEARCH (Bible screen) with full verse search
    --------------------------------------------------------- */
 function initSearch(){
   const toggle = document.getElementById("search-toggle");
@@ -478,7 +415,7 @@ function initSearch(){
   input.addEventListener("input", () => {
     const term = input.value.trim().toLowerCase();
     if (!term) return;
-    
+
     const match = ALL_BOOKS.find(b => b.toLowerCase().startsWith(term));
     if (match && match.toLowerCase() === term) {
       bookSelect.value = match;
@@ -506,7 +443,7 @@ function performSearch(){
     const bookName = verseRefMatch[1].trim();
     const chapterNum = parseInt(verseRefMatch[2]);
     const verseNum = parseInt(verseRefMatch[3]);
-    
+
     const matchedBook = ALL_BOOKS.find(b => b.toLowerCase() === bookName.toLowerCase());
     if (matchedBook && VERSES[matchedBook] && VERSES[matchedBook][chapterNum]) {
       const verses = VERSES[matchedBook][chapterNum];
@@ -568,7 +505,7 @@ function performSearch(){
 
   const first = results[0];
   navigateToVerse(first.book, first.chapter, first.verse);
-  
+
   const msg = `Found ${results.length} result${results.length > 1 ? 's' : ''} for "${query}"`;
   showToast(msg);
 }
@@ -582,19 +519,16 @@ function navigateToVerse(book, chapter, verse){
   state.currentBook = book;
   state.currentChapter = chapter;
   renderVerses(book, chapter);
-  
+
   setTimeout(() => {
-    const cebItems = document.querySelectorAll("#verse-list-cebuano .verse-item");
-    const engItems = document.querySelectorAll("#verse-list-english .verse-item");
+    const rows = document.querySelectorAll("#verse-rows .verse-row");
     const idx = verse - 1;
-    if (cebItems[idx]) {
-      cebItems[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
-      cebItems[idx].style.backgroundColor = "rgba(201, 162, 39, 0.15)";
-      setTimeout(() => { cebItems[idx].style.backgroundColor = ""; }, 2000);
-    }
-    if (engItems[idx]) {
-      engItems[idx].style.backgroundColor = "rgba(201, 162, 39, 0.15)";
-      setTimeout(() => { engItems[idx].style.backgroundColor = ""; }, 2000);
+    const row = rows[idx];
+    if (row) {
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const originalBg = row.style.backgroundColor;
+      row.style.backgroundColor = "rgba(201, 162, 39, 0.15)";
+      setTimeout(() => { row.style.backgroundColor = originalBg; }, 2000);
     }
   }, 300);
 }
@@ -611,7 +545,7 @@ function navigateToChapter(book, chapter){
 }
 
 /* ---------------------------------------------------------
-   15. TOAST NOTIFICATION
+   14. TOAST NOTIFICATION
    --------------------------------------------------------- */
 function showToast(message){
   const toast = document.getElementById("toast-notification");
@@ -620,7 +554,7 @@ function showToast(message){
   toast.classList.remove("hidden");
   void toast.offsetWidth;
   toast.classList.add("show");
-  
+
   clearTimeout(toast._timeout);
   toast._timeout = setTimeout(() => {
     toast.classList.remove("show");
@@ -631,7 +565,7 @@ function showToast(message){
 }
 
 /* ---------------------------------------------------------
-   16. BOTTOM NAVIGATION
+   15. BOTTOM NAVIGATION
    --------------------------------------------------------- */
 function initNav(){
   const navButtons = document.querySelectorAll(".nav-btn");
@@ -641,7 +575,7 @@ function initNav(){
       switchScreen(target);
       navButtons.forEach(b => b.classList.toggle("active", b === btn));
       document.getElementById("verse-toolbar").classList.add("hidden");
-      document.querySelectorAll(".verse-item.selected").forEach(el => el.classList.remove("selected"));
+      document.querySelectorAll(".verse-row.selected").forEach(el => el.classList.remove("selected"));
       state.selectedVerse = null;
     });
   });
@@ -654,7 +588,7 @@ function switchScreen(name){
 }
 
 /* ---------------------------------------------------------
-   17. QUIZ SCREEN
+   16. QUIZ SCREEN
    --------------------------------------------------------- */
 function initQuiz(){
   const catButtons = document.querySelectorAll(".quiz-cat-btn");
@@ -759,7 +693,7 @@ function shuffle(arr){
 }
 
 /* ---------------------------------------------------------
-   18. DICTIONARY SCREEN
+   17. DICTIONARY SCREEN
    --------------------------------------------------------- */
 function initDictionary(){
   const input = document.getElementById("dict-search-input");
@@ -803,7 +737,7 @@ function renderDictionary(entries){
 }
 
 /* ---------------------------------------------------------
-   19. SETTINGS SCREEN - Theme, Font & Font Size
+   18. SETTINGS SCREEN - Theme, Font & Font Size
    --------------------------------------------------------- */
 function initSettings(){
   const themeButtons = document.querySelectorAll(".theme-btn");
@@ -893,7 +827,7 @@ function loadSavedPreferences(){
 }
 
 /* ---------------------------------------------------------
-   20. UTILITIES
+   19. UTILITIES
    --------------------------------------------------------- */
 function escapeHtml(str){
   const div = document.createElement("div");
@@ -902,7 +836,7 @@ function escapeHtml(str){
 }
 
 /* ---------------------------------------------------------
-   21. PWA SERVICE WORKER REGISTRATION
+   20. PWA SERVICE WORKER REGISTRATION
    --------------------------------------------------------- */
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
