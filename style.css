@@ -335,40 +335,40 @@ input::-webkit-calendar-picker-indicator {
   padding:14px 10px 100px;
   -webkit-overflow-scrolling:touch;
   transition: background 0.3s ease;
-  position:relative;
 }
 
-/* =========================================================
-   HEADER ROW - COMPLETELY FIXED WITH SOLID BACKGROUND
-   ========================================================= */
 .reading-header-row{
   position:sticky;
   top:0;
   display:grid;
   grid-template-columns: 1fr 1fr;
-  z-index:20;
+  /* Solid, non-transparent background color (not a gradient or rgba
+     value) so verse rows scrolling underneath can never show through. */
+  background-color:var(--ivory);
+  opacity:1;
+  z-index:5;
   border-bottom:2px solid var(--gold);
-  margin-bottom:6px;
-  transition: background 0.3s ease, border-color 0.3s ease;
-  
-  /* CRITICAL FIX: Solid background that covers everything underneath */
-  background-color: var(--ivory);
-  background: var(--ivory);
-  background: var(--ivory) !important;
-  background-color: var(--ivory) !important;
-  
-  /* Ensure no transparency */
-  opacity: 1;
-  
-  /* Extra protection with backdrop */
-  backdrop-filter: none;
-  
-  /* Shadow for separation from verses */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  margin-bottom:4px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  /* Force the sticky header onto its own compositor layer. In some
+     browsers (notably Safari/iOS) a sticky element without its own
+     layer can be painted as partially transparent while pinned,
+     letting scrolled content bleed through — this prevents that. */
+  transform:translateZ(0);
+  -webkit-transform:translateZ(0);
+  -webkit-backface-visibility:hidden;
+  backface-visibility:hidden;
+  isolation:isolate;
+  will-change:transform;
 }
 
+/* Each header cell also gets its own solid background. Because the
+   row uses CSS Grid, the two cells are the elements actually painted
+   on top of the scrolling content — if only the parent row had a
+   background, some engines paint grid item backgrounds first and can
+   create a seam where verse text peeks through between cells. */
 .reading-col-header{
-  padding:8px 12px 10px;
+  padding:6px 12px 12px;
   font-family:'Playfair Display', serif;
   font-weight:600;
   font-size:14.5px;
@@ -376,14 +376,8 @@ input::-webkit-calendar-picker-indicator {
   display:flex;
   align-items:center;
   gap:8px;
-  transition: color 0.3s ease;
-  
-  /* CRITICAL FIX: Solid background for each cell */
-  background-color: var(--ivory);
-  background: var(--ivory);
-  background: var(--ivory) !important;
-  background-color: var(--ivory) !important;
-  opacity: 1;
+  background-color:var(--ivory);
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 .reading-col-header-ceb{
@@ -406,14 +400,12 @@ input::-webkit-calendar-picker-indicator {
   color:#fff;
   padding:2px 6px;
   border-radius:4px;
-  flex-shrink:0;
 }
 
 /* Rows */
 .verse-rows{
   display:flex;
   flex-direction:column;
-  padding-top:2px;
   position:relative;
   z-index:1;
 }
@@ -425,7 +417,6 @@ input::-webkit-calendar-picker-indicator {
   cursor:pointer;
   transition: background 0.2s ease, border-color 0.3s ease;
   border-radius:4px;
-  position:relative;
 }
 .verse-row:last-child{ border-bottom:none; }
 .verse-row:hover{ background:rgba(201,162,39,0.06); }
@@ -981,10 +972,7 @@ input::-webkit-calendar-picker-indicator {
     min-width: 20px;
     font-size: 11px;
   }
-  .reading-col-header{ 
-    padding:6px 6px 10px; 
-    font-size:12.5px;
-  }
+  .reading-col-header{ padding:6px 6px 12px; font-size:12.5px; }
   .topbar-title{ font-size:18px; }
   .quiz-stats{ gap:8px; }
   .stat-value{ font-size:20px; }
