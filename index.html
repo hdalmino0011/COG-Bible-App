@@ -66,23 +66,21 @@
       </div>
     </div>
 
-    <!-- Reading Pane with synchronized scrolling -->
+    <!-- Reading Pane — ONE unified scroll container. Each verse is a single
+         row with two cells (Cebuano | English) so they can never drift
+         out of sync; there is only one scrollbar for the whole pane. -->
     <div class="reading-pane" id="reading-pane">
-      <div class="reading-col" id="col-cebuano">
-        <div class="reading-col-header">
+      <div class="reading-header-row">
+        <div class="reading-col-header reading-col-header-ceb">
           <span class="col-flag">CEB</span>
           Cebuano <em>(Bugna KJV)</em>
         </div>
-        <div class="verse-list" id="verse-list-cebuano"></div>
-      </div>
-      <div class="reading-divider" aria-hidden="true"></div>
-      <div class="reading-col" id="col-english">
-        <div class="reading-col-header">
+        <div class="reading-col-header reading-col-header-eng">
           <span class="col-flag">ENG</span>
           English <em>(KJV)</em>
         </div>
-        <div class="verse-list" id="verse-list-english"></div>
       </div>
+      <div class="verse-rows" id="verse-rows"></div>
     </div>
 
     <!-- Toast notification for search results -->
