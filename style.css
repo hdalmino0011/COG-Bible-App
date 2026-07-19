@@ -321,7 +321,9 @@ input::-webkit-calendar-picker-indicator {
   pointer-events:none;
 }
 
-/* Reading pane - synchronized scrolling */
+/* =========================================================
+   READING PANE - FIXED SYNCHRONIZED SCROLLING
+   ========================================================= */
 .reading-pane{
   flex:1;
   min-height:0;
@@ -329,66 +331,105 @@ input::-webkit-calendar-picker-indicator {
   padding:14px 10px 0;
   overflow:hidden;
   position:relative;
+  gap:0;
 }
+
 .reading-col{
   flex:1;
   min-width:0;
   display:flex;
   flex-direction:column;
   overflow-y:auto;
+  overflow-x:hidden;
   padding:0 10px 80px;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   transition: background 0.3s ease;
-  /* Ensure both columns have same scroll behavior */
   -webkit-overflow-scrolling: touch;
+  /* Ensure both columns have the same height */
+  height: 100%;
+  position: relative;
 }
+
 .reading-col-header{
-  position:sticky; top:0;
+  position:sticky; 
+  top:0;
   background:var(--ivory);
   padding:6px 0 12px;
   font-family:'Playfair Display', serif;
   font-weight:600;
   font-size:14.5px;
   color:var(--blue-deep);
-  display:flex; align-items:center; gap:8px;
+  display:flex; 
+  align-items:center; 
+  gap:8px;
   z-index:2;
   transition: background 0.3s ease, color 0.3s ease;
+  border-bottom: 2px solid var(--gold);
+  margin-bottom: 4px;
 }
-.reading-col-header em{ font-style:italic; color:var(--slate-soft); font-size:12px; font-weight:400; }
+
+.reading-col-header em{ 
+  font-style:italic; 
+  color:var(--slate-soft); 
+  font-size:12px; 
+  font-weight:400; 
+}
+
 .col-flag{
   font-family:'Roboto', sans-serif;
-  font-size:9px; font-weight:700; letter-spacing:0.5px;
-  background:var(--blue-mid); color:#fff;
-  padding:2px 6px; border-radius:4px;
+  font-size:9px; 
+  font-weight:700; 
+  letter-spacing:0.5px;
+  background:var(--blue-mid); 
+  color:#fff;
+  padding:2px 6px; 
+  border-radius:4px;
 }
+
 .reading-divider{
   width:1px;
   background:linear-gradient(var(--line), var(--gold), var(--line));
   flex-shrink:0;
   margin:0 2px;
+  position: relative;
 }
 
-/* Verse list - font size controlled by JS */
+/* =========================================================
+   VERSE LIST - FIXED ALIGNMENT
+   ========================================================= */
 .verse-list{ 
   display:flex; 
   flex-direction:column; 
-  gap:2px;
+  gap:0;
   font-family: var(--app-font);
   font-size: var(--font-size-base);
+  padding-bottom: 20px;
 }
+
+/* Each verse item - fixed height for perfect alignment */
 .verse-item{
   font-size: inherit;
   line-height:1.7;
-  padding:6px 8px;
+  padding:8px 8px;
   border-radius:4px;
   border-bottom:1px dashed var(--line);
   color:var(--slate);
   cursor:pointer;
   transition: background 0.2s ease, border-color 0.3s ease;
   position:relative;
+  min-height: 40px;
+  /* Ensure both columns have the same height for each verse */
+  display: flex;
+  align-items: flex-start;
 }
-.verse-item:last-child{ border-bottom:none; }
-.verse-item:hover{ background:rgba(201,162,39,0.06); }
+
+.verse-item:last-child{ 
+  border-bottom: none; 
+}
+
+.verse-item:hover{ 
+  background:rgba(201,162,39,0.06); 
+}
 
 /* Font size classes */
 body.font-size-small .verse-list { --font-size-base: var(--font-size-small); }
@@ -401,28 +442,36 @@ body.font-size-xlarge .verse-list { --font-size-base: var(--font-size-xlarge); }
   font-size: var(--font-size-base);
 }
 
-/* Verse highlight colors - FIXED with !important */
+/* Verse highlight colors */
 .verse-item.highlight-yellow{ background:#FFD700 !important; }
 .verse-item.highlight-pink{ background:#FFB6C1 !important; }
 .verse-item.highlight-green{ background:#98FB98 !important; }
 .verse-item.highlight-blue{ background:#87CEEB !important; }
 
-/* Selected verse for copying */
+/* Selected verse for copying - only on long press */
 .verse-item.selected{
   outline: 2px solid var(--gold);
   outline-offset: -2px;
   background: rgba(201,162,39,0.12) !important;
+  border-radius: 4px;
 }
 
 .verse-num{
   display:inline-block;
-  min-width:20px;
+  min-width:28px;
   color:var(--gold);
   font-weight:700;
   font-size:12px;
-  vertical-align:super;
-  margin-right:4px;
+  margin-right:6px;
+  flex-shrink:0;
+  text-align:right;
 }
+
+.verse-text {
+  flex: 1;
+  word-wrap: break-word;
+}
+
 .verse-empty{
   color:var(--slate-soft);
   font-style:italic;
@@ -464,7 +513,7 @@ body.font-size-xlarge .verse-list { --font-size-base: var(--font-size-xlarge); }
 }
 
 /* =========================================================
-   VERSE TOOLBAR (floating)
+   VERSE TOOLBAR - appears on long press
    ========================================================= */
 .verse-toolbar {
   position: fixed;
@@ -921,7 +970,15 @@ body.font-size-xlarge .verse-list { --font-size-base: var(--font-size-xlarge); }
 @media (max-width: 480px){
   .reading-pane{ padding:10px 4px 0; }
   .reading-col{ padding:0 6px 80px; }
-  .verse-item{ font-size: var(--font-size-base); }
+  .verse-item{ 
+    font-size: var(--font-size-base);
+    min-height: 36px;
+    padding: 6px 4px;
+  }
+  .verse-num {
+    min-width: 22px;
+    font-size: 11px;
+  }
   .topbar-title{ font-size:18px; }
   .quiz-stats{ gap:8px; }
   .stat-value{ font-size:20px; }
