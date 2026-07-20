@@ -147,15 +147,25 @@
   <section id="screen-dictionary" class="screen">
     <header class="topbar">
       <h1 class="topbar-title">Bible Dictionary</h1>
+      <button class="icon-btn" id="dict-back-btn" style="display:none;">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
     </header>
 
-    <div class="screen-scroll">
-      <div class="search-bar static-search">
-        <i class="fa-solid fa-magnifying-glass search-bar-icon"></i>
-        <input type="text" id="dict-search-input" placeholder="Search a term…">
+    <div class="screen-scroll" id="dict-scroll">
+      <!-- Dictionary List View -->
+      <div id="dictionary-list-view">
+        <div class="search-bar static-search">
+          <i class="fa-solid fa-magnifying-glass search-bar-icon"></i>
+          <input type="text" id="dict-search-input" placeholder="Search a term…">
+        </div>
+        <div id="dictionary-list" class="dictionary-list"></div>
       </div>
 
-      <div id="dictionary-list" class="dictionary-list"></div>
+      <!-- Dictionary Article View -->
+      <div id="dictionary-article-view" class="dictionary-article-view hidden">
+        <div id="dictionary-article-content"></div>
+      </div>
     </div>
   </section>
 
