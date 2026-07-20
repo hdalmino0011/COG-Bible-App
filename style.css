@@ -332,7 +332,14 @@ input::-webkit-calendar-picker-indicator {
   min-height:0;
   overflow-y:auto;
   overflow-x:hidden;
-  padding:14px 10px 100px;
+  /* No top padding here — the header supplies its own top spacing
+     instead. If the scroll container had top padding, the sticky
+     header could only lock flush once that padding had been scrolled
+     past, leaving a brief gap above it where the first verse row was
+     still visible. Removing it means the header is flush against the
+     scrollport from the very first pixel of scroll, so nothing can
+     ever appear above it. */
+  padding:0 10px 100px;
   -webkit-overflow-scrolling:touch;
   transition: background 0.3s ease;
 }
@@ -362,8 +369,10 @@ input::-webkit-calendar-picker-indicator {
   will-change:transform;
   /* Fixed height + clipping: even if a rendering engine tries to let a
      sliver of the row below peek through at the header's edge, this
-     hard-clips anything outside the header's own box. */
-  height:52px;
+     hard-clips anything outside the header's own box. Height includes
+     the 14px top spacing formerly on .reading-pane, now moved here. */
+  height:66px;
+  padding-top:14px;
   overflow:hidden;
 }
 
@@ -374,7 +383,7 @@ input::-webkit-calendar-picker-indicator {
    create a seam where verse text peeks through between cells. */
 .reading-col-header{
   height:100%;
-  padding:6px 12px 12px;
+  padding:0 12px 12px;
   font-family:'Playfair Display', serif;
   font-weight:600;
   font-size:14.5px;
@@ -970,7 +979,7 @@ input::-webkit-calendar-picker-indicator {
    RESPONSIVE
    ========================================================= */
 @media (max-width: 480px){
-  .reading-pane{ padding:10px 4px 100px; }
+  .reading-pane{ padding:0 4px 100px; }
   .verse-cell{
     font-size: var(--font-size-base);
     padding: 6px 6px;
@@ -979,7 +988,8 @@ input::-webkit-calendar-picker-indicator {
     min-width: 20px;
     font-size: 11px;
   }
-  .reading-col-header{ padding:6px 6px 12px; font-size:12.5px; }
+  .reading-header-row{ height:60px; padding-top:12px; }
+  .reading-col-header{ padding:0 6px 12px; font-size:12.5px; }
   .topbar-title{ font-size:18px; }
   .quiz-stats{ gap:8px; }
   .stat-value{ font-size:20px; }
