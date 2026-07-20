@@ -49,8 +49,56 @@ const VERSES = {
 
 /* ---------------------------------------------------------
    3. DICTIONARY DATA - EXPANDED WITH FULL ARTICLES
+   CORRECTED: YHWH/Tetragrammaton entry added, Yahweh references removed
    --------------------------------------------------------- */
 const DICTIONARY = [
+  {
+    term: "YHWH (Tetragrammaton)",
+    category: "Divine Name",
+    shortDefinition: "The sacred four-letter Hebrew name of God (יהוה), consisting of four consonants with no vowels; the original pronunciation is unknown.",
+    origin: "Hebrew",
+    references: "Exodus 3:15, Exodus 6:3, Isaiah 42:8",
+    article: {
+      sections: [
+        {
+          heading: "Overview",
+          content: "The Tetragrammaton is the four-letter Hebrew name of God, written as YHWH (יהוה). It consists of four consonants with no vowels, making the original pronunciation unknown. The name is considered the most sacred name of God in the Hebrew Scriptures, appearing over 6,800 times in the Old Testament."
+        },
+        {
+          heading: "Etymology and Meaning",
+          content: "The name YHWH is derived from the Hebrew verb 'to be' (היה, hayah) and is understood to mean 'He who is' or 'I AM WHO I AM' as revealed to Moses at the burning bush (Exodus 3:14). The name signifies God's eternal, self-existent nature as the One who is, who was, and who is to come."
+        },
+        {
+          heading: "Original Pronunciation Unknown",
+          content: "Ancient Hebrew was written without vowels, so the original pronunciation of YHWH has been lost to history. The pronunciation 'YAHWEH' is a modern scholarly reconstruction, not the original pronunciation. No one knows exactly how it was pronounced in ancient times, as the vowel sounds were passed down orally and later lost. The Septuagint (Greek translation) rendered it as 'Kyrios' (Lord), and the Masoretic Text used the vowel points of 'Adonai' (Lord) as a reminder to say 'Adonai' instead of pronouncing the sacred name."
+        },
+        {
+          heading: "Reverence and Tradition",
+          content: "Due to the sanctity of the name, Jewish tradition developed the practice of saying 'Adonai' (Lord) or 'HaShem' (The Name) when reading YHWH in the Scriptures. This tradition of reverence has continued for thousands of years. Many English translations render YHWH as 'LORD' (in small caps) to follow this tradition."
+        },
+        {
+          heading: "Significance",
+          content: "The Tetragrammaton represents God's unique, personal, and covenantal name. It distinguishes the God of Israel from the gods of surrounding nations and affirms His sovereignty, faithfulness, and eternal nature. The name is a declaration of who God is — the self-existent, unchanging, and all-sufficient One."
+        }
+      ],
+      bibleReferences: [
+        "Exodus 3:14-15",
+        "Exodus 6:3",
+        "Exodus 20:2",
+        "Deuteronomy 6:4",
+        "Isaiah 42:8",
+        "Isaiah 44:6",
+        "Psalm 83:18",
+        "Leviticus 24:16"
+      ],
+      externalLinks: [
+        { label: "Wikipedia - Tetragrammaton", url: "https://en.wikipedia.org/wiki/Tetragrammaton" },
+        { label: "Bible Hub - YHWH", url: "https://biblehub.com/hebrew/3068.htm" },
+        { label: "Britannica - Tetragrammaton", url: "https://www.britannica.com/topic/Tetragrammaton" },
+        { label: "Got Questions - What is YHWH?", url: "https://www.gotquestions.org/YHWH-tetragrammaton.html" }
+      ]
+    }
+  },
   {
     term: "Baal",
     category: "Deity",
@@ -65,7 +113,7 @@ const DICTIONARY = [
         },
         {
           heading: "Biblical Context",
-          content: "The worship of Baal is frequently condemned in the Old Testament as a rival to the worship of Yahweh, the God of Israel. The Israelites were repeatedly warned against adopting Baal worship, which often involved idolatry, child sacrifice, and ritual prostitution. The prophet Elijah's confrontation with the prophets of Baal on Mount Carmel (1 Kings 18) is one of the most dramatic biblical accounts of this conflict."
+          content: "The worship of Baal is frequently condemned in the Old Testament as a rival to the worship of YHWH, the God of Israel. The Israelites were repeatedly warned against adopting Baal worship, which often involved idolatry, child sacrifice, and ritual prostitution. The prophet Elijah's confrontation with the prophets of Baal on Mount Carmel (1 Kings 18) is one of the most dramatic biblical accounts of this conflict."
         },
         {
           heading: "Significance",
@@ -97,7 +145,7 @@ const DICTIONARY = [
       sections: [
         {
           heading: "Overview",
-          content: "The term 'Messiah' comes from the Hebrew word 'Mashiach,' meaning 'Anointed One.' In the Old Testament, anointing was a ceremonial act of consecrating priests, prophets, and kings, symbolizing God's chosen appointment. The Messiah concept developed into a hope for a future deliverer who would liberate Israel and establish God's kingdom."
+          content: "The term 'Messiah' comes from the Hebrew word 'Mashiach,' meaning 'Anointed One.' In the Old Testament, anointing was a ceremonial act of consecrating priests, prophets, and kings, symbolizing God's chosen appointment. The Messiah concept developed into a hope for a future deliverer who would liberate Israel and establish God's kingdom under the authority of YHWH."
         },
         {
           heading: "Old Testament Prophecies",
@@ -138,7 +186,7 @@ const DICTIONARY = [
       sections: [
         {
           heading: "Overview",
-          content: "Jerusalem is one of the oldest and most historically significant cities in the world. It is considered holy by Judaism, Christianity, and Islam. Located in the Judean Mountains between the Mediterranean Sea and the Dead Sea, Jerusalem has been the spiritual and political center of the Jewish people for over 3,000 years."
+          content: "Jerusalem is one of the oldest and most historically significant cities in the world. It is considered holy by Judaism, Christianity, and Islam. Located in the Judean Mountains between the Mediterranean Sea and the Dead Sea, Jerusalem has been the spiritual and political center of the Jewish people for over 3,000 years, chosen by YHWH as the place where His name would dwell."
         },
         {
           heading: "Biblical History",
@@ -175,7 +223,7 @@ const DICTIONARY = [
       sections: [
         {
           heading: "Overview",
-          content: "The Ark of the Covenant was a sacred chest constructed by the Israelites at God's command during their wilderness journey. Overlaid with gold, it contained the two stone tablets of the Ten Commandments, Aaron's rod, and a pot of manna. The Ark served as the visible symbol of God's covenant with Israel and His presence among them."
+          content: "The Ark of the Covenant was a sacred chest constructed by the Israelites at God's command during their wilderness journey. Overlaid with gold, it contained the two stone tablets of the Ten Commandments, Aaron's rod, and a pot of manna. The Ark served as the visible symbol of God's covenant with Israel and His presence among them, representing the throne of YHWH."
         },
         {
           heading: "Construction and Purpose",
@@ -212,7 +260,7 @@ const DICTIONARY = [
       sections: [
         {
           heading: "Overview",
-          content: "The Tabernacle was a portable sanctuary that served as the dwelling place of God among the Israelites during their 40 years of wandering in the wilderness. It was a tent-like structure constructed according to detailed divine instructions given to Moses on Mount Sinai."
+          content: "The Tabernacle was a portable sanctuary that served as the dwelling place of God among the Israelites during their 40 years of wandering in the wilderness. It was a tent-like structure constructed according to detailed divine instructions given to Moses on Mount Sinai, providing a place where the presence of YHWH could dwell among His people."
         },
         {
           heading: "Construction and Layout",
