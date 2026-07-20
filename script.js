@@ -48,15 +48,240 @@ const VERSES = {
 };
 
 /* ---------------------------------------------------------
-   3. DICTIONARY DATA
+   3. DICTIONARY DATA - EXPANDED WITH FULL ARTICLES
    --------------------------------------------------------- */
 const DICTIONARY = [
-  { term:"Baal", category:"Deity", definition:"Canaanite fertility god worshipped by surrounding pagan nations; frequently condemned in Scripture as a rival to worship of the true God.", origin:"Canaanite", references:"Judges 2:11, 1 Kings 18" },
-  { term:"Messiah", category:"Title", definition:"Hebrew word meaning \"Anointed One,\" referring to the promised deliverer and king foretold throughout the Old Testament.", origin:"Hebrew", references:"Daniel 9:25-26" },
-  { term:"Jerusalem", category:"Place", definition:"Holy city and capital of Israel, center of Jewish worship and the site of Solomon's Temple.", origin:"Hebrew", references:"2 Samuel 5:6-10" },
-  { term:"Ark of the Covenant", category:"Object", definition:"Sacred gold-covered chest containing the tablets of the Law, a symbol of God's presence among His people.", origin:"Israelite", references:"Exodus 25:10-22" },
-  { term:"Tabernacle", category:"Place", definition:"Portable sanctuary used by the Israelites for worship during their wilderness wanderings.", origin:"Hebrew", references:"Exodus 25-27" },
-  { term:"Sabbath", category:"Concept", definition:"The seventh day, set apart as a day of rest and worship, commanded as part of the Law given to Israel.", origin:"Hebrew", references:"Exodus 20:8-11" }
+  {
+    term: "Baal",
+    category: "Deity",
+    shortDefinition: "Canaanite fertility god worshipped by surrounding pagan nations; frequently condemned in Scripture as a rival to worship of the true God.",
+    origin: "Canaanite",
+    references: "Judges 2:11, 1 Kings 18",
+    article: {
+      sections: [
+        {
+          heading: "Overview",
+          content: "Baal was a prominent Canaanite fertility god worshipped extensively in the ancient Near East, particularly among the Phoenicians, Philistines, and other Canaanite tribes. The name 'Baal' means 'lord' or 'master' in Semitic languages and was used as a title for various local deities."
+        },
+        {
+          heading: "Biblical Context",
+          content: "The worship of Baal is frequently condemned in the Old Testament as a rival to the worship of Yahweh, the God of Israel. The Israelites were repeatedly warned against adopting Baal worship, which often involved idolatry, child sacrifice, and ritual prostitution. The prophet Elijah's confrontation with the prophets of Baal on Mount Carmel (1 Kings 18) is one of the most dramatic biblical accounts of this conflict."
+        },
+        {
+          heading: "Significance",
+          content: "Baal worship represented the constant struggle between faithfulness to God and the temptation to adopt the religious practices of surrounding nations. The biblical narrative portrays Baal as a false god who cannot answer his followers or provide for them, in contrast to the living God who hears and responds to His people."
+        }
+      ],
+      bibleReferences: [
+        "Judges 2:11",
+        "Judges 3:7",
+        "1 Kings 18:16-40",
+        "2 Kings 10:18-28",
+        "Jeremiah 2:23",
+        "Hosea 2:8"
+      ],
+      externalLinks: [
+        { label: "Wikipedia - Baal", url: "https://en.wikipedia.org/wiki/Baal" },
+        { label: "Bible Hub - Baal", url: "https://biblehub.com/topical/b/baal.htm" },
+        { label: "Britannica - Baal", url: "https://www.britannica.com/topic/Baal-ancient-deity" }
+      ]
+    }
+  },
+  {
+    term: "Messiah",
+    category: "Title",
+    shortDefinition: "Hebrew word meaning \"Anointed One,\" referring to the promised deliverer and king foretold throughout the Old Testament.",
+    origin: "Hebrew",
+    references: "Daniel 9:25-26",
+    article: {
+      sections: [
+        {
+          heading: "Overview",
+          content: "The term 'Messiah' comes from the Hebrew word 'Mashiach,' meaning 'Anointed One.' In the Old Testament, anointing was a ceremonial act of consecrating priests, prophets, and kings, symbolizing God's chosen appointment. The Messiah concept developed into a hope for a future deliverer who would liberate Israel and establish God's kingdom."
+        },
+        {
+          heading: "Old Testament Prophecies",
+          content: "The Old Testament contains numerous prophecies pointing to a coming Messiah. These include Isaiah's prophecy of a virgin-born son (Isaiah 7:14), Micah's prediction of a ruler born in Bethlehem (Micah 5:2), and Daniel's vision of an everlasting kingdom (Daniel 7:13-14). The Psalms also contain messianic passages that were later interpreted as referring to Jesus."
+        },
+        {
+          heading: "New Testament Fulfillment",
+          content: "Christians believe that Jesus of Nazareth is the promised Messiah. The New Testament presents Jesus as fulfilling Old Testament prophecies through his birth, life, death, and resurrection. The title 'Christ' is the Greek equivalent of 'Messiah,' and the Gospels frequently present Jesus as the fulfillment of messianic expectations, though not in the political way many first-century Jews anticipated."
+        }
+      ],
+      bibleReferences: [
+        "Isaiah 7:14",
+        "Isaiah 9:6-7",
+        "Micah 5:2",
+        "Daniel 9:25-26",
+        "Psalm 2:7",
+        "Psalm 22",
+        "Matthew 1:1-17",
+        "Luke 24:25-27",
+        "John 1:41",
+        "Acts 2:36"
+      ],
+      externalLinks: [
+        { label: "Wikipedia - Messiah", url: "https://en.wikipedia.org/wiki/Messiah" },
+        { label: "Bible Hub - Messiah", url: "https://biblehub.com/topical/m/messiah.htm" },
+        { label: "Britannica - Messiah", url: "https://www.britannica.com/topic/messiah-religion" },
+        { label: "Got Questions - What is the Messiah?", url: "https://www.gotquestions.org/messiah.html" }
+      ]
+    }
+  },
+  {
+    term: "Jerusalem",
+    category: "Place",
+    shortDefinition: "Holy city and capital of Israel, center of Jewish worship and the site of Solomon's Temple.",
+    origin: "Hebrew",
+    references: "2 Samuel 5:6-10",
+    article: {
+      sections: [
+        {
+          heading: "Overview",
+          content: "Jerusalem is one of the oldest and most historically significant cities in the world. It is considered holy by Judaism, Christianity, and Islam. Located in the Judean Mountains between the Mediterranean Sea and the Dead Sea, Jerusalem has been the spiritual and political center of the Jewish people for over 3,000 years."
+        },
+        {
+          heading: "Biblical History",
+          content: "Jerusalem's significance in the Bible begins with King David, who captured the city from the Jebusites and made it his capital (2 Samuel 5:6-10). David's son Solomon built the First Temple on Mount Moriah, establishing Jerusalem as the center of Israelite worship. The city was later destroyed by the Babylonians in 586 BCE, and the Second Temple was built after the Persian exile."
+        },
+        {
+          heading: "Spiritual Significance",
+          content: "Jerusalem represents God's chosen dwelling place on earth. The Psalms express deep longing for Jerusalem (Psalm 122, 137). In the New Testament, Jesus weeps over Jerusalem (Luke 19:41-44), and the book of Revelation describes the New Jerusalem as the ultimate dwelling place of God with His people (Revelation 21)."
+        }
+      ],
+      bibleReferences: [
+        "2 Samuel 5:6-10",
+        "1 Kings 8:1-21",
+        "Psalm 122",
+        "Psalm 137",
+        "Isaiah 2:2-4",
+        "Luke 19:41-44",
+        "Revelation 21"
+      ],
+      externalLinks: [
+        { label: "Wikipedia - Jerusalem", url: "https://en.wikipedia.org/wiki/Jerusalem" },
+        { label: "Bible Hub - Jerusalem", url: "https://biblehub.com/topical/j/jerusalem.htm" },
+        { label: "Britannica - Jerusalem", url: "https://www.britannica.com/place/Jerusalem" }
+      ]
+    }
+  },
+  {
+    term: "Ark of the Covenant",
+    category: "Object",
+    shortDefinition: "Sacred gold-covered chest containing the tablets of the Law, a symbol of God's presence among His people.",
+    origin: "Israelite",
+    references: "Exodus 25:10-22",
+    article: {
+      sections: [
+        {
+          heading: "Overview",
+          content: "The Ark of the Covenant was a sacred chest constructed by the Israelites at God's command during their wilderness journey. Overlaid with gold, it contained the two stone tablets of the Ten Commandments, Aaron's rod, and a pot of manna. The Ark served as the visible symbol of God's covenant with Israel and His presence among them."
+        },
+        {
+          heading: "Construction and Purpose",
+          content: "Detailed instructions for the Ark's construction are given in Exodus 25. The Ark was placed in the Most Holy Place of the Tabernacle (and later the Temple), and the mercy seat on top served as the location where God's presence would appear and where the high priest would make atonement for the people on the Day of Atonement."
+        },
+        {
+          heading: "Significance",
+          content: "The Ark represented God's throne on earth and His covenant relationship with Israel. It was carried before the people as they journeyed, and its presence brought victory in battle (Joshua 6). The loss of the Ark to the Philistines (1 Samuel 4) was a national tragedy, and its recovery demonstrated God's sovereignty over all nations."
+        }
+      ],
+      bibleReferences: [
+        "Exodus 25:10-22",
+        "Exodus 37:1-9",
+        "Leviticus 16",
+        "Joshua 6:6-20",
+        "1 Samuel 4-6",
+        "2 Samuel 6:1-15",
+        "Hebrews 9:1-5"
+      ],
+      externalLinks: [
+        { label: "Wikipedia - Ark of the Covenant", url: "https://en.wikipedia.org/wiki/Ark_of_the_Covenant" },
+        { label: "Bible Hub - Ark of the Covenant", url: "https://biblehub.com/topical/a/ark_of_the_covenant.htm" },
+        { label: "Britannica - Ark of the Covenant", url: "https://www.britannica.com/topic/Ark-of-the-Covenant" }
+      ]
+    }
+  },
+  {
+    term: "Tabernacle",
+    category: "Place",
+    shortDefinition: "Portable sanctuary used by the Israelites for worship during their wilderness wanderings.",
+    origin: "Hebrew",
+    references: "Exodus 25-27",
+    article: {
+      sections: [
+        {
+          heading: "Overview",
+          content: "The Tabernacle was a portable sanctuary that served as the dwelling place of God among the Israelites during their 40 years of wandering in the wilderness. It was a tent-like structure constructed according to detailed divine instructions given to Moses on Mount Sinai."
+        },
+        {
+          heading: "Construction and Layout",
+          content: "The Tabernacle consisted of a courtyard with an altar of burnt offering and a laver for washing, and a covered tent divided into two sections: the Holy Place and the Most Holy Place. The Holy Place contained the golden lampstand, the table of showbread, and the altar of incense, while the Most Holy Place housed the Ark of the Covenant."
+        },
+        {
+          heading: "Spiritual Significance",
+          content: "The Tabernacle served as the focal point of Israel's worship and symbolized God's presence among His people. It represented the way to approach God through sacrifice and the high priest's ministry. The New Testament draws parallels between the Tabernacle and the work of Christ, who entered the heavenly sanctuary once for all."
+        }
+      ],
+      bibleReferences: [
+        "Exodus 25-27",
+        "Exodus 36-40",
+        "Leviticus 1-7",
+        "Numbers 9:15-23",
+        "Hebrews 8:1-5",
+        "Hebrews 9:1-28"
+      ],
+      externalLinks: [
+        { label: "Wikipedia - Tabernacle", url: "https://en.wikipedia.org/wiki/Tabernacle" },
+        { label: "Bible Hub - Tabernacle", url: "https://biblehub.com/topical/t/tabernacle.htm" },
+        { label: "Britannica - Tabernacle", url: "https://www.britannica.com/topic/Tabernacle" }
+      ]
+    }
+  },
+  {
+    term: "Sabbath",
+    category: "Concept",
+    shortDefinition: "The seventh day, set apart as a day of rest and worship, commanded as part of the Law given to Israel.",
+    origin: "Hebrew",
+    references: "Exodus 20:8-11",
+    article: {
+      sections: [
+        {
+          heading: "Overview",
+          content: "The Sabbath is the seventh day of the week, which God established as a day of rest and worship. The term comes from the Hebrew word 'Shabbat,' meaning 'to cease' or 'to rest.' The Sabbath was instituted at creation when God rested from His work and was later codified as one of the Ten Commandments."
+        },
+        {
+          heading: "Biblical Foundation",
+          content: "The Sabbath is rooted in the creation narrative (Genesis 2:2-3) and is commanded in the Ten Commandments (Exodus 20:8-11). It served as a sign of the covenant between God and Israel (Exodus 31:13-17) and a reminder of God's deliverance from Egypt (Deuteronomy 5:15). The Sabbath was to be observed as a holy day, free from regular work."
+        },
+        {
+          heading: "New Testament Perspective",
+          content: "In the New Testament, Jesus frequently clashed with religious leaders over Sabbath observance, teaching that the Sabbath was made for man's benefit and that doing good was lawful on the Sabbath (Mark 2:27-28). The early church debated the role of Sabbath observance, with the apostle Paul teaching that believers should not be judged regarding Sabbath days (Colossians 2:16-17)."
+        },
+        {
+          heading: "Significance",
+          content: "The Sabbath represents God's desire for His people to rest in Him and find refreshment. It is a weekly reminder of creation, redemption, and the ultimate rest that believers anticipate in God's eternal kingdom."
+        }
+      ],
+      bibleReferences: [
+        "Genesis 2:2-3",
+        "Exodus 20:8-11",
+        "Exodus 31:13-17",
+        "Deuteronomy 5:12-15",
+        "Isaiah 58:13-14",
+        "Mark 2:27-28",
+        "Luke 13:10-17",
+        "Colossians 2:16-17",
+        "Hebrews 4:1-11"
+      ],
+      externalLinks: [
+        { label: "Wikipedia - Sabbath", url: "https://en.wikipedia.org/wiki/Sabbath" },
+        { label: "Bible Hub - Sabbath", url: "https://biblehub.com/topical/s/sabbath.htm" },
+        { label: "Britannica - Sabbath", url: "https://www.britannica.com/topic/Sabbath" },
+        { label: "Got Questions - What is the Sabbath?", url: "https://www.gotquestions.org/Sabbath.html" }
+      ]
+    }
+  }
 ];
 
 /* ---------------------------------------------------------
@@ -90,13 +315,14 @@ const state = {
   quizSession: null,
   currentBook: "John",
   currentChapter: 1,
-  selectedVerse: null,   // { book, chapter, verse, index, rowEl }
+  selectedVerse: null,
   highlightColor: null,
   theme: "light",
   font: "Roboto",
   fontSize: "medium",
   longPressTimer: null,
-  isLongPress: false
+  isLongPress: false,
+  currentArticle: null
 };
 
 /* ---------------------------------------------------------
@@ -213,7 +439,6 @@ function renderVerses(book, chapter){
       </div>
     `;
 
-    // Long press on the whole row selects it (both languages together)
     row.addEventListener("mousedown", (e) => startLongPress(e, row, book, chapter, verse.v, index));
     row.addEventListener("mouseup", () => clearLongPress());
     row.addEventListener("mouseleave", () => clearLongPress());
@@ -693,24 +918,33 @@ function shuffle(arr){
 }
 
 /* ---------------------------------------------------------
-   17. DICTIONARY SCREEN
+   17. DICTIONARY SCREEN - WITH ARTICLE VIEW
    --------------------------------------------------------- */
 function initDictionary(){
   const input = document.getElementById("dict-search-input");
-  renderDictionary(DICTIONARY);
+  const backBtn = document.getElementById("dict-back-btn");
+  const listView = document.getElementById("dictionary-list-view");
+  const articleView = document.getElementById("dictionary-article-view");
+  
+  renderDictionaryList(DICTIONARY);
 
   input.addEventListener("input", () => {
     const term = input.value.trim().toLowerCase();
     const filtered = DICTIONARY.filter(entry =>
       entry.term.toLowerCase().includes(term) ||
-      entry.definition.toLowerCase().includes(term) ||
+      entry.shortDefinition.toLowerCase().includes(term) ||
       entry.category.toLowerCase().includes(term)
     );
-    renderDictionary(filtered);
+    renderDictionaryList(filtered);
+  });
+
+  // Back button to return to list view
+  backBtn.addEventListener("click", () => {
+    showDictionaryListView();
   });
 }
 
-function renderDictionary(entries){
+function renderDictionaryList(entries){
   const list = document.getElementById("dictionary-list");
   list.innerHTML = "";
 
@@ -720,20 +954,167 @@ function renderDictionary(entries){
   }
 
   entries.forEach(entry => {
-    list.insertAdjacentHTML("beforeend", `
-      <div class="dict-entry">
-        <div class="dict-entry-head">
-          <span class="dict-term">${escapeHtml(entry.term)}</span>
-          <span class="dict-category">${escapeHtml(entry.category)}</span>
-        </div>
-        <div class="dict-definition">${escapeHtml(entry.definition)}</div>
-        <div class="dict-meta">
-          <span><strong>Origin:</strong> ${escapeHtml(entry.origin)}</span>
-          <span><strong>References:</strong> ${escapeHtml(entry.references)}</span>
-        </div>
+    const div = document.createElement("div");
+    div.className = "dict-entry";
+    div.innerHTML = `
+      <div class="dict-entry-head">
+        <span class="dict-term">${escapeHtml(entry.term)}</span>
+        <span class="dict-category">${escapeHtml(entry.category)}</span>
       </div>
-    `);
+      <div class="dict-definition">${escapeHtml(entry.shortDefinition)}</div>
+      <div class="dict-meta">
+        <span><strong>Origin:</strong> ${escapeHtml(entry.origin)}</span>
+        <span><strong>References:</strong> ${escapeHtml(entry.references)}</span>
+      </div>
+      <div class="dict-click-hint"><i class="fa-solid fa-arrow-right"></i> Tap to read full article</div>
+    `;
+    
+    div.addEventListener("click", () => {
+      showDictionaryArticle(entry);
+    });
+    
+    list.appendChild(div);
   });
+}
+
+function showDictionaryArticle(entry){
+  const listView = document.getElementById("dictionary-list-view");
+  const articleView = document.getElementById("dictionary-article-view");
+  const content = document.getElementById("dictionary-article-content");
+  const backBtn = document.getElementById("dict-back-btn");
+  
+  // Hide list, show article
+  listView.style.display = "none";
+  articleView.classList.remove("hidden");
+  backBtn.style.display = "flex";
+  
+  // Store current article
+  state.currentArticle = entry;
+  
+  // Build article HTML
+  let html = `
+    <div class="dict-article-back" id="article-back-btn">
+      <i class="fa-solid fa-arrow-left"></i> Back to Dictionary
+    </div>
+    <h1 class="dict-article-title">${escapeHtml(entry.term)}</h1>
+    <div class="dict-article-category">${escapeHtml(entry.category)}</div>
+  `;
+  
+  // Render sections
+  if (entry.article && entry.article.sections) {
+    entry.article.sections.forEach(section => {
+      html += `
+        <div class="dict-article-section">
+          <h3>${escapeHtml(section.heading)}</h3>
+          <p>${escapeHtml(section.content)}</p>
+        </div>
+      `;
+    });
+  }
+  
+  // Render Bible References
+  if (entry.article && entry.article.bibleReferences && entry.article.bibleReferences.length > 0) {
+    html += `
+      <div class="dict-article-section">
+        <h3>Bible References</h3>
+        <p>
+    `;
+    entry.article.bibleReferences.forEach(ref => {
+      html += `<span class="dict-article-bible-ref" data-ref="${escapeHtml(ref)}">${escapeHtml(ref)}</span> `;
+    });
+    html += `
+        </p>
+      </div>
+    `;
+  }
+  
+  // Render External Links
+  if (entry.article && entry.article.externalLinks && entry.article.externalLinks.length > 0) {
+    html += `
+      <div class="dict-article-section">
+        <h3>External Resources</h3>
+        <p>
+    `;
+    entry.article.externalLinks.forEach(link => {
+      html += `
+        <a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer" class="dict-article-external-link">
+          <i class="fa-solid fa-external-link-alt"></i> ${escapeHtml(link.label)}
+        </a><br>
+      `;
+    });
+    html += `
+        </p>
+      </div>
+    `;
+  }
+  
+  content.innerHTML = html;
+  
+  // Add event listeners for Bible reference clicks
+  document.querySelectorAll('.dict-article-bible-ref').forEach(el => {
+    el.addEventListener('click', function() {
+      const ref = this.dataset.ref;
+      handleBibleReferenceClick(ref);
+    });
+  });
+  
+  // Add event listener for back button inside article
+  document.getElementById('article-back-btn').addEventListener('click', showDictionaryListView);
+}
+
+function showDictionaryListView(){
+  const listView = document.getElementById("dictionary-list-view");
+  const articleView = document.getElementById("dictionary-article-view");
+  const backBtn = document.getElementById("dict-back-btn");
+  
+  listView.style.display = "block";
+  articleView.classList.add("hidden");
+  backBtn.style.display = "none";
+  state.currentArticle = null;
+}
+
+function handleBibleReferenceClick(ref){
+  // Parse reference like "Exodus 20:8-11" or "Genesis 2:2-3"
+  const match = ref.match(/^(\d?\s*[A-Za-z]+\s*\d?)\s+(\d+):(\d+)(?:-(\d+))?$/i);
+  if (match) {
+    const bookName = match[1].trim();
+    const chapterNum = parseInt(match[2]);
+    const verseNum = parseInt(match[3]);
+    
+    const matchedBook = ALL_BOOKS.find(b => b.toLowerCase() === bookName.toLowerCase());
+    if (matchedBook && VERSES[matchedBook] && VERSES[matchedBook][chapterNum]) {
+      // Navigate to Bible screen
+      switchScreen('bible');
+      
+      // Update book and chapter selectors
+      const bookSelect = document.getElementById("book-select");
+      const chapterSelect = document.getElementById("chapter-select");
+      bookSelect.value = matchedBook;
+      populateChapters(chapterNum);
+      chapterSelect.value = chapterNum;
+      state.currentBook = matchedBook;
+      state.currentChapter = chapterNum;
+      renderVerses(matchedBook, chapterNum);
+      
+      // Navigate to the specific verse
+      setTimeout(() => {
+        const rows = document.querySelectorAll("#verse-rows .verse-row");
+        const idx = verseNum - 1;
+        const row = rows[idx];
+        if (row) {
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          const originalBg = row.style.backgroundColor;
+          row.style.backgroundColor = "rgba(201, 162, 39, 0.15)";
+          setTimeout(() => { row.style.backgroundColor = originalBg; }, 2000);
+        }
+        showToast(`✓ Navigated to ${ref}`);
+      }, 300);
+    } else {
+      showToast(`✗ "${ref}" not found in available verses`);
+    }
+  } else {
+    showToast(`✗ Could not parse "${ref}"`);
+  }
 }
 
 /* ---------------------------------------------------------
