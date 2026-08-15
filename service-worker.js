@@ -1,9 +1,10 @@
-const CACHE_NAME = 'cog-bible-v2';
+const CACHE_NAME = 'cog-bible-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './logo.jpg',
+  './verses.json',
   'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'
 ];
