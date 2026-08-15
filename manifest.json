@@ -3,7 +3,9 @@
   "short_name": "COG Bible",
   "description": "The Church of God (Truth, Justice, and Righteousness) Bible App",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#1B3A6B",
   "theme_color": "#1B3A6B",
   "orientation": "portrait",
@@ -11,73 +13,12 @@
   "lang": "en",
   "dir": "ltr",
   "icons": [
-    {
-      "src": "logo.jpg",
-      "sizes": "512x512",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "logo.jpg",
-      "sizes": "192x192",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "logo.jpg",
-      "sizes": "144x144",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "logo.jpg",
-      "sizes": "128x128",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "logo.jpg",
-      "sizes": "96x96",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "logo.jpg",
-      "sizes": "72x72",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
-    }
+    {"src":"./logo.jpg","sizes":"512x512","type":"image/jpeg","purpose":"any maskable"},
+    {"src":"./logo.jpg","sizes":"192x192","type":"image/jpeg","purpose":"any maskable"}
   ],
-  "screenshots": [],
-  "prefer_related_applications": false,
-  "related_applications": [],
   "shortcuts": [
-    {
-      "name": "Open Bible",
-      "short_name": "Bible",
-      "description": "Go directly to Bible reading",
-      "url": "./index.html#bible",
-      "icons": [
-        {
-          "src": "logo.jpg",
-          "sizes": "96x96",
-          "type": "image/jpeg"
-        }
-      ]
-    },
-    {
-      "name": "Open Quiz",
-      "short_name": "Quiz",
-      "description": "Go directly to Bible Quiz",
-      "url": "./index.html#quiz",
-      "icons": [
-        {
-          "src": "logo.jpg",
-          "sizes": "96x96",
-          "type": "image/jpeg"
-        }
-      ]
-    }
+    {"name":"Open Bible","short_name":"Bible","url":"./index.html#bible","icons":[{"src":"./logo.jpg","sizes":"96x96","type":"image/jpeg"}]},
+    {"name":"Open Quiz","short_name":"Quiz","url":"./index.html#quiz","icons":[{"src":"./logo.jpg","sizes":"96x96","type":"image/jpeg"}]}
   ],
-  "display_override": ["standalone", "minimal-ui"]
+  "prefer_related_applications": false
 }
