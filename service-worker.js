@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cog-bible-v4';
+const CACHE_NAME = 'cog-bible-v5';
 const APP_SHELL = [
   './',
   './index.html',
