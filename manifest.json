@@ -2,7 +2,7 @@
   "name": "COG (T.J.R) Bible",
   "short_name": "COG Bible",
   "description": "The Church of God (Truth, Justice, and Righteousness) Bible App",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1B3A6B",
   "theme_color": "#1B3A6B",
@@ -56,7 +56,7 @@
       "name": "Open Bible",
       "short_name": "Bible",
       "description": "Go directly to Bible reading",
-      "url": "/index.html#bible",
+      "url": "./index.html#bible",
       "icons": [
         {
           "src": "logo.jpg",
@@ -69,7 +69,7 @@
       "name": "Open Quiz",
       "short_name": "Quiz",
       "description": "Go directly to Bible Quiz",
-      "url": "/index.html#quiz",
+      "url": "./index.html#quiz",
       "icons": [
         {
           "src": "logo.jpg",
