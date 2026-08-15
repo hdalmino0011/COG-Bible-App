@@ -1,11 +1,9 @@
 const CACHE_NAME = 'cog-bible-v2';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/script.js',
-  '/manifest.json',
-  '/logo.jpg',
+  './',
+  './index.html',
+  './manifest.json',
+  './logo.jpg',
   'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'
 ];
@@ -81,7 +79,7 @@ self.addEventListener('fetch', event => {
           .catch(() => {
             // Return offline fallback for navigation requests
             if (event.request.mode === 'navigate') {
-              return caches.match('/index.html')
+              return caches.match('./index.html')
                 .then(cached => {
                   if (cached) {
                     return cached;
@@ -119,7 +117,7 @@ self.addEventListener('push', event => {
     badge: '/logo.jpg',
     vibrate: [200, 100, 200],
     data: {
-      url: data.url || '/'
+      url: data.url || './'
     }
   };
 
@@ -134,7 +132,7 @@ self.addEventListener('notificationclick', event => {
   
   const url = event.notification.data && event.notification.data.url 
     ? event.notification.data.url 
-    : '/';
+    : './';
   
   event.waitUntil(
     clients.matchAll({ type: 'window' })
