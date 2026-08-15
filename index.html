@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <!-- =========================================================
-     ALL STYLES INLINE (no external style.css needed)
+     ALL STYLES INLINE
      ========================================================= -->
 <style>
 /* =========================================================
@@ -1304,9 +1304,7 @@ body.font-size-xlarge { --font-size-base: 21px; }
       </div>
     </div>
 
-    <!-- Reading Pane — ONE unified scroll container. Each verse is a single
-         row with two cells (Cebuano | English) so they can never drift
-         out of sync; there is only one scrollbar for the whole pane. -->
+    <!-- Reading Pane — ONE unified scroll container -->
     <div class="reading-pane" id="reading-pane">
       <div class="reading-header-row">
         <div class="reading-col-header reading-col-header-ceb">
@@ -1503,9 +1501,15 @@ body.font-size-xlarge { --font-size-base: 21px; }
 </div>
 
 <!-- =========================================================
-     ALL JAVASCRIPT INLINE (no external script.js needed)
+     ALL JAVASCRIPT INLINE (updated for verses.json loading)
      ========================================================= -->
 <script>
+/* ---------------------------------------------------------
+   0. GLOBAL VARIABLES
+   --------------------------------------------------------- */
+let VERSES = {};              // Will be filled from verses.json
+let BIBLE_LOADED = false;
+
 /* ---------------------------------------------------------
    1. BIBLE BOOK LIST (66 books)
    --------------------------------------------------------- */
@@ -1529,31 +1533,7 @@ const BOOKS = {
 const ALL_BOOKS = Object.values(BOOKS).flat();
 
 /* ---------------------------------------------------------
-   2. SAMPLE VERSE DATA (placeholder — English + Cebuano)
-   --------------------------------------------------------- */
-const VERSES = {
-  "John": {
-    1: [
-      { v:1, en:"In the beginning was the Word, and the Word was with God, and the Word was God.", ceb:"Sa sinugdanan mao ang Pulong, ug ang Pulong uban sa Dios, ug ang Pulong mao ang Dios." },
-      { v:2, en:"The same was in the beginning with God.", ceb:"Siya maoy diha sa sinugdanan uban sa Dios." },
-      { v:3, en:"All things were made by him; and without him was not any thing made that was made.", ceb:"Ang tanan nga mga butang gibuhat pinaagi kaniya; ug kung wala kaniya walay bisan unsa nga nahimo nga nahimo." },
-      { v:4, en:"In him was life; and the life was the light of men.", ceb:"Kaniya ang kinabuhi; ug ang kinabuhi mao ang kahayag sa mga tawo." },
-      { v:5, en:"And the light shineth in darkness; and the darkness comprehended it not.", ceb:"Ug ang kahayag misidlak sa kangitngit; ug ang kangitngit wala makasabut niini." }
-    ]
-  },
-  "Psalms": {
-    23: [
-      { v:1, en:"The Lord is my shepherd; I shall not want.", ceb:"Si Jehova mao ang akong magbalantay; ako dili makulangan." },
-      { v:2, en:"He maketh me to lie down in green pastures: he leadeth me beside the still waters.", ceb:"Siya nagpahulay kanako sa mga sibsibanan nga lunhaw: siya nagatultol kanako sa daplin sa mga tubig nga malinawon." },
-      { v:3, en:"He restoreth my soul: he leadeth me in the paths of righteousness for his name's sake.", ceb:"Siya nagapasig-uli sa akong kalag: siya nagatultol kanako sa mga alagianan sa pagkamatarung tungod sa iyang ngalan." },
-      { v:4, en:"Yea, though I walk through the valley of the shadow of death, I will fear no evil: for thou art with me.", ceb:"Bisan pa maglakaw ako sa walog sa landong sa kamatayon, ako dili mahadlok sa kadautan: kay ikaw kauban ko." }
-    ]
-  }
-};
-
-/* ---------------------------------------------------------
-   3. DICTIONARY DATA - EXPANDED WITH FULL ARTICLES
-   CORRECTED: YHWH/Tetragrammaton entry added, Yahweh references removed
+   2. DICTIONARY DATA (unchanged)
    --------------------------------------------------------- */
 const DICTIONARY = [
   {
@@ -1837,7 +1817,7 @@ const DICTIONARY = [
 ];
 
 /* ---------------------------------------------------------
-   4. QUIZ QUESTIONS
+   3. QUIZ QUESTIONS
    --------------------------------------------------------- */
 const QUIZ_QUESTIONS = {
   old: [
@@ -1858,14 +1838,14 @@ const QUIZ_QUESTIONS = {
 QUIZ_QUESTIONS.all = [...QUIZ_QUESTIONS.old, ...QUIZ_QUESTIONS.new];
 
 /* ---------------------------------------------------------
-   5. STATE
+   4. STATE
    --------------------------------------------------------- */
 const state = {
   currentScreen: "bible",
   quizCategory: "old",
   quizStats: { total: 0, correct: 0 },
   quizSession: null,
-  currentBook: "John",
+  currentBook: "Genesis",
   currentChapter: 1,
   selectedVerse: null,
   highlightColor: null,
@@ -1878,21 +1858,54 @@ const state = {
 };
 
 /* ---------------------------------------------------------
-   6. INIT
+   5. LOAD BIBLE DATA FROM verses.json
    --------------------------------------------------------- */
-document.addEventListener("DOMContentLoaded", () => {
-  initSplash();
-  initBookSelectors();
-  initSearch();
-  initNav();
-  initQuiz();
-  initDictionary();
-  initSettings();
-  initVerseToolbar();
-  renderVerses("John", 1);
-  registerServiceWorker();
-  loadSavedPreferences();
-});
+async function loadBibleData() {
+    try {
+        const response = await fetch('verses.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        VERSES = await response.json();
+        BIBLE_LOADED = true;
+        console.log(`✅ Bible loaded: ${Object.keys(VERSES).length} books, ${countVerses(VERSES)} verses`);
+        initApp(); // Start the app after data is loaded
+    } catch (error) {
+        console.error('❌ Failed to load Bible data:', error);
+        document.getElementById('verse-rows').innerHTML =
+            '<div class="verse-row-empty">⚠️ Failed to load Bible data. Please check your internet connection and refresh.</div>';
+        // Still show the UI but with a loading error
+        document.getElementById('app').classList.remove('hidden');
+        document.getElementById('splash-screen').style.display = 'none';
+    }
+}
+
+function countVerses(data) {
+    let count = 0;
+    for (const book of Object.values(data)) {
+        for (const chapter of Object.values(book)) {
+            count += chapter.length;
+        }
+    }
+    return count;
+}
+
+/* ---------------------------------------------------------
+   6. INIT — called after data loads
+   --------------------------------------------------------- */
+function initApp() {
+    initSplash();
+    initBookSelectors();
+    initSearch();
+    initNav();
+    initQuiz();
+    initDictionary();
+    initSettings();
+    initVerseToolbar();
+    renderVerses(state.currentBook, state.currentChapter);
+    registerServiceWorker();
+    loadSavedPreferences();
+}
 
 /* ---------------------------------------------------------
    7. SPLASH SCREEN
@@ -1900,6 +1913,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function initSplash(){
   const splash = document.getElementById("splash-screen");
   const app = document.getElementById("app");
+  // The splash will fade out after 2.6s via CSS; ensure app becomes visible
   setTimeout(() => {
     splash.style.display = "none";
     app.classList.remove("hidden");
@@ -1913,6 +1927,9 @@ function initBookSelectors(){
   const bookSelect = document.getElementById("book-select");
   const chapterSelect = document.getElementById("chapter-select");
 
+  // Clear any existing options (in case of re-init)
+  bookSelect.innerHTML = '';
+
   Object.entries(BOOKS).forEach(([testament, books]) => {
     const group = document.createElement("optgroup");
     group.label = testament;
@@ -1920,14 +1937,14 @@ function initBookSelectors(){
       const opt = document.createElement("option");
       opt.value = book;
       opt.textContent = book;
-      if (book === "John") opt.selected = true;
+      if (book === state.currentBook) opt.selected = true;
       group.appendChild(opt);
     });
     bookSelect.appendChild(group);
   });
 
-  populateChapters(1);
-  chapterSelect.value = 1;
+  populateChapters(state.currentChapter);
+  chapterSelect.value = state.currentChapter;
 
   bookSelect.addEventListener("change", () => {
     state.currentBook = bookSelect.value;
@@ -1946,12 +1963,15 @@ function initBookSelectors(){
 function populateChapters(defaultChapter){
   const chapterSelect = document.getElementById("chapter-select");
   chapterSelect.innerHTML = "";
+  // Show chapters 1-5 as sample (app will show empty if no data)
   for (let i = 1; i <= 5; i++){
     const opt = document.createElement("option");
     opt.value = i;
     opt.textContent = "Chapter " + i;
     chapterSelect.appendChild(opt);
   }
+  // If the book has more chapters, we could dynamically extend, but for now keep it simple
+  // The app will display "Text not loaded" if chapter missing.
   chapterSelect.value = defaultChapter;
 }
 
@@ -1968,7 +1988,7 @@ function renderVerses(book, chapter){
 
   if (!data){
     rowsContainer.innerHTML =
-      `<div class="verse-row-empty">Text for ${escapeHtml(book)} ${chapter} isn't loaded in this sample yet. Try John 1 or Psalms 23.</div>`;
+      `<div class="verse-row-empty">Text for ${escapeHtml(book)} ${chapter} is not available yet. Try another chapter.</div>`;
     return;
   }
 
@@ -2774,7 +2794,6 @@ function escapeHtml(str){
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      // FIXED: use relative path './service-worker.js' instead of '/service-worker.js'
       navigator.serviceWorker.register('./service-worker.js')
         .then(registration => {
           console.log('Service Worker registered successfully:', registration);
@@ -2786,6 +2805,16 @@ function registerServiceWorker() {
   } else {
     console.log('Service Workers not supported in this browser.');
   }
+}
+
+/* ---------------------------------------------------------
+   21. START: Load Bible Data → initApp()
+   --------------------------------------------------------- */
+// Wait for DOM to be ready, then load Bible data
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadBibleData);
+} else {
+    loadBibleData();
 }
 </script>
 </body>
